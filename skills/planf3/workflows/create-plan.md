@@ -1,9 +1,9 @@
 # Create Plan
 
-Пайплайн:
+Pipeline:
 
 ```text
-SOLUTION.md или USER_PROMPT
+SOLUTION.md or USER_PROMPT
 → draft implementation plan
 → Plan Challenger
 → Lean Plan Challenger
@@ -12,48 +12,48 @@ SOLUTION.md или USER_PROMPT
 → READY_FOR_BUILD
 ```
 
-## 1. Определи источник
+## 1. Determine the source
 
-1. Если есть `SOLUTION.md` со статусом `READY_FOR_PLANF3`, используй его как архитектурный контракт.
-2. Если `SOLUTION.md` отсутствует, можно создать план только для локальной низкорисковой задачи. Для архитектурной задачи верни `BLOCKED` и попроси `solution-design`.
-3. Если `SOLUTION.md` имеет `BLOCKED` или `BLOCKED_BY_SCOPE_OVERDESIGN` — не планируй.
-4. Прочитай `CURRENT_STATE.md`, если он релевантен.
-5. Прочитай локальные инструкции: `AGENTS.md`, `CLAUDE.md`, README, build/test docs.
+1. If there is a `SOLUTION.md` with the `READY_FOR_PLANF3` status, use it as the architectural contract.
+2. If `SOLUTION.md` is absent, a plan may be created only for a local low-risk task. For an architectural task, return `BLOCKED` and ask for `solution-design`.
+3. If `SOLUTION.md` has `BLOCKED` or `BLOCKED_BY_SCOPE_OVERDESIGN` — do not plan.
+4. Read `CURRENT_STATE.md` if it is relevant.
+5. Read the local instructions: `AGENTS.md`, `CLAUDE.md`, README, build/test docs.
 
-## 2. Зафиксируй границы
+## 2. Fix the boundaries
 
-В плане должны быть явные:
+The plan must explicitly contain:
 
 - authoritative requirements;
-- что строим;
-- что не строим;
-- complexity budget;
-- files-to-change budget;
-- оценка LOC net для всего плана;
+- what we are building;
+- what we are not building;
+- the complexity budget;
+- the files-to-change budget;
+- the estimated LOC net for the whole plan;
 - validation commands;
 - stop conditions.
 
-## 3. Создай draft Markdown-план
+## 3. Create the draft Markdown plan
 
-Файл: `specs/<descriptive-kebab-name>-implementation-plan.md`.
+File: `specs/<descriptive-kebab-name>-implementation-plan.md`.
 
-Обязательная структура:
+Mandatory structure:
 
 ```md
-# План реализации: <название>
+# Implementation plan: <title>
 
-# Блок 1. Для человека
+# Block 1. For the human
 
-## 1. Коротко
-## 2. Что будет сделано
-## 3. Что не делаем
-## 4. Риски
-## 5. Как проверить
-## 6. Готовность
+## 1. In short
+## 2. What will be done
+## 3. What we are not doing
+## 4. Risks
+## 5. How to verify
+## 6. Readiness
 
 ---
 
-# Блок 2. Для агента
+# Block 2. For the agent
 
 ## 1. Metadata
 ## 2. Source priority
@@ -73,27 +73,27 @@ SOLUTION.md или USER_PROMPT
 
 ## 4. Human block
 
-Коротко, без перегруза:
+Short, without overload:
 
-- цель;
-- минимальный подход;
-- основные файлы/области;
+- the goal;
+- the minimal approach;
+- the main files/areas;
 - explicit non-goals;
-- главные риски;
-- одна команда или список команд для финальной проверки;
-- статус.
+- the main risks;
+- one command or a list of commands for the final check;
+- the status.
 
-Не больше 1–2 экранов текста.
+No more than 1–2 screens of text.
 
 ## 5. Agent block
 
-Должен быть достаточен для автономного Build Plan:
+Must be sufficient for an autonomous Build Plan:
 
 - source priority;
 - `SOLUTION.md` decisions;
 - plan status;
 - phase statuses: `[]`, `[wip]`, `[x]`, `[f]`;
-- разрешённые и запрещённые области;
+- allowed and forbidden areas;
 - exact validation commands;
 - observable pass conditions;
 - stop conditions;
@@ -102,7 +102,7 @@ SOLUTION.md или USER_PROMPT
 
 ## 6. Minimality contract
 
-Обязателен:
+Mandatory:
 
 | Category | Budget | Exceeded? | Justification |
 |----------|--------|-----------|---------------|
@@ -112,24 +112,24 @@ SOLUTION.md или USER_PROMPT
 | New global abstractions | 0 unless reused now | | |
 | New docs | only contract/usage/validation | | |
 
-Если план превышает бюджет без доказанного текущего требования — исправь или поставь `BLOCKED_BY_SCOPE_OVERDESIGN`.
+If the plan exceeds the budget without a proven current requirement — fix it or set `BLOCKED_BY_SCOPE_OVERDESIGN`.
 
 ## 7. Files to change budget
 
 | File / directory | Existing/New | Why required | Requirement | Can be avoided? |
 |------------------|--------------|--------------|-------------|-----------------|
 
-Каждый новый файл должен иметь причину. Если можно сделать локально без нового слоя — предпочитай локально.
+Every new file must have a reason. If it can be done locally without a new layer — prefer locally.
 
-Под таблицей укажи суммарную оценку: `Estimated LOC net: ~N`. Она используется стоп-правилом 2× во время Build Plan.
+Below the table, state the total estimate: `Estimated LOC net: ~N`. It is used by the 2× stop rule during Build Plan.
 
-## 8. Фазы
+## 8. Phases
 
-Фазы должны быть последовательными, маленькими и проверяемыми.
+Phases must be sequential, small, and verifiable.
 
-Для каждой фазы:
+For each phase:
 
-- цель;
+- goal;
 - scope;
 - allowed files;
 - forbidden changes;
@@ -138,15 +138,15 @@ SOLUTION.md или USER_PROMPT
 - verifier focus;
 - exit criteria.
 
-Не распараллеливай зависимые фазы.
+Do not parallelize dependent phases.
 
 ## 9. Plan Challenger
 
-Запусти fresh read-only Plan Challenger. Он ищет correctness gaps:
+Launch a fresh read-only Plan Challenger. It hunts for correctness gaps:
 
 - missing requirements;
 - changes to `SOLUTION.md` contracts;
-- decisions deferred to builder;
+- decisions deferred to the builder;
 - missing operation/state lifecycle;
 - missing auth/safety/failure behavior;
 - non-reproducible validation;
@@ -155,7 +155,7 @@ SOLUTION.md или USER_PROMPT
 
 ## 10. Lean Plan Challenger
 
-Запусти fresh read-only Lean Challenger. Он ищет overengineering:
+Launch a fresh read-only Lean Challenger. It hunts for overengineering:
 
 - unnecessary files;
 - unnecessary dependencies;
@@ -163,24 +163,24 @@ SOLUTION.md или USER_PROMPT
 - persistent state that can be derived;
 - future work;
 - unrelated refactors;
-- validation harness larger than feature;
+- a validation harness larger than the feature;
 - docs that do not define contract/usage/validation.
 
-## 11. Коррекция
+## 11. Correction
 
-Accepted findings исправь. Unsupported findings отклони с причиной. Если найдено новое design decision — `BLOCKED_FOR_SOLUTION_AMENDMENT`.
+Fix the accepted findings. Reject unsupported findings with a reason. If a new design decision is discovered — `BLOCKED_FOR_SOLUTION_AMENDMENT`.
 
 ## 12. Readiness
 
-Запусти `plan-readiness-gate.md`.
+Run `plan-readiness-gate.md`.
 
-Только после PASS ставь `READY_FOR_BUILD`.
+Only after PASS set `READY_FOR_BUILD`.
 
-## 13. Финал
+## 13. Finish
 
-Сообщи:
+Report:
 
-- путь к созданному плану;
-- статус;
-- что было исключено как overengineering;
-- какие проверки должны пройти перед коммитом.
+- the path to the created plan;
+- the status;
+- what was excluded as overengineering;
+- which checks must pass before the commit.

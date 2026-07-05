@@ -1,70 +1,70 @@
 # Design Readiness Gate
 
-Запусти после draft, Design Challenger и Lean Challenger.
+Run after the draft, the Design Challenger, and the Lean Challenger.
 
-`READY_FOR_PLANF3` разрешён только после PASS всех применимых gates.
+`READY_FOR_PLANF3` is allowed only after a PASS on all applicable gates.
 
 ## 1. Decision closure
 
-Найди фразы риска:
+Find risk phrases:
 
-- “implementation may”;
-- “either/or”;
-- “PlanF3 should choose”;
-- “implementer decides”;
-- “could use”;
-- “client may handle”;
-- “exact behavior later”.
+- "implementation may";
+- "either/or";
+- "PlanF3 should choose";
+- "implementer decides";
+- "could use";
+- "client may handle";
+- "exact behavior later".
 
-Для каждого случая: выбери поведение, классифицируй как non-blocking implementation detail, оформи assumption с проверкой или поставь `BLOCKED`.
+For each occurrence: choose the behavior, classify it as a non-blocking implementation detail, turn it into an assumption with a validation method, or set `BLOCKED`.
 
-PlanF3 не выбирает архитектуру, public behavior, auth policy, source of truth, migration semantics, idempotency semantics или future scope.
+PlanF3 does not choose architecture, public behavior, auth policy, source of truth, migration semantics, idempotency semantics, or future scope.
 
 ## 2. Minimality gate
 
-Проверь:
+Check:
 
-- выбран smallest acceptable solution;
-- каждая новая dependency/subsystem/state/abstraction обоснована текущим requirement ID;
-- есть simpler alternative и причина отказа;
-- future-only ideas вынесены в Future Work;
-- нет unrelated refactor;
-- нет платформы для гипотетического будущего.
+- the smallest acceptable solution is chosen;
+- every new dependency/subsystem/state/abstraction is justified by a current requirement ID;
+- there is a simpler alternative and a reason it was rejected;
+- future-only ideas are moved to Future Work;
+- there is no unrelated refactor;
+- there is no platform for a hypothetical future.
 
-Если решение корректное, но overbuilt — статус `BLOCKED_BY_SCOPE_OVERDESIGN`.
+If the solution is correct but overbuilt — status `BLOCKED_BY_SCOPE_OVERDESIGN`.
 
 ## 3. Operation contract closure
 
-Для каждой material operation/action/job/command/game action/state-changing flow определены preconditions, postcondition, retry/repeat/concurrency, missing target, failure behavior, observable result.
+For every material operation/action/job/command/game action/state-changing flow, the preconditions, postcondition, retry/repeat/concurrency, missing target, failure behavior, and observable result are defined.
 
 ## 4. State lifecycle closure
 
-Для каждого нового/изменённого state/cache/storage/relationship/snapshot/derived value определены source of truth, creation/update/delete, owner changes, rollback/cleanup.
+For every new/changed state/cache/storage/relationship/snapshot/derived value, the source of truth, creation/update/delete, owner changes, and rollback/cleanup are defined.
 
 ## 5. Access/safety closure
 
-Для read/write/action surfaces определены actor, owner, boundary, unauthenticated/unauthorized behavior, sensitive data, secret handling.
+For the read/write/action surfaces, the actor, owner, boundary, unauthenticated/unauthorized behavior, sensitive data, and secret handling are defined.
 
 ## 6. Feasibility closure
 
-Для каждой framework/platform capability есть evidence, official docs, spike, fallback или blocking unknown.
+Every framework/platform capability has evidence, official docs, a spike, a fallback, or a blocking unknown.
 
 ## 7. Traceability closure
 
-- каждое requirement имеет design response;
-- каждое requirement имеет observable verification;
-- каждое decision связано с drivers/evidence;
-- каждый risk имеет mitigation/verification;
-- каждый unknown blocking или non-blocking;
-- каждое non-blocking assumption имеет validation method.
+- every requirement has a design response;
+- every requirement has observable verification;
+- every decision is linked to drivers/evidence;
+- every risk has a mitigation/verification;
+- every unknown is blocking or non-blocking;
+- every non-blocking assumption has a validation method.
 
 ## 8. PlanF3 handoff closure
 
-Handoff содержит fixed contracts, fixed behavior, minimality constraints, exclusions и no architecture choice for PlanF3.
+The handoff contains fixed contracts, fixed behavior, minimality constraints, exclusions, and no architecture choice for PlanF3.
 
 ## Result
 
-Внутренне верни одно:
+Internally return exactly one:
 
 - `PASS`
 - `FAIL: <failed gates>`

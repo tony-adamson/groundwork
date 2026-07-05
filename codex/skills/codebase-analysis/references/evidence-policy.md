@@ -1,45 +1,45 @@
 # Evidence policy
 
-Каждое существенное утверждение о текущей системе должно иметь проверяемое основание.
+Every material statement about the current system must have a verifiable basis.
 
-## Типы утверждений
+## Statement types
 
-- `FACT` — прямо подтверждено кодом, тестом, конфигом, схемой, manifest, безопасной командой или документацией репозитория.
-- `INFERENCE` — разумный вывод из нескольких фактов.
-- `UNKNOWN` — нет достаточного подтверждения или источники конфликтуют.
+- `FACT` — directly confirmed by code, a test, a config, a schema, a manifest, a safe command, or repository documentation.
+- `INFERENCE` — a reasonable conclusion drawn from several facts.
+- `UNKNOWN` — no sufficient confirmation, or the sources conflict.
 
-Не используй проценты уверенности модели.
+Do not use model confidence percentages.
 
-## Допустимые источники
+## Acceptable sources
 
-- относительный путь к файлу;
-- symbol: class/function/type/route/component/task/test/target/module;
-- test name;
-- schema/migration/file format;
-- manifest/build/config key;
-- CI workflow;
-- безопасная read-only команда и её существенный результат;
-- документация внутри репозитория, если она не противоречит коду.
+- a relative file path;
+- a symbol: class/function/type/route/component/task/test/target/module;
+- a test name;
+- a schema/migration/file format;
+- a manifest/build/config key;
+- a CI workflow;
+- a safe read-only command and its material output;
+- documentation inside the repository, if it does not contradict the code.
 
-## Конфликт источников
+## Conflicting sources
 
-Если README говорит одно, а код другое:
+If the README says one thing and the code says another:
 
-1. зафиксируй конфликт;
-2. укажи, какой источник сильнее для текущего поведения;
-3. не скрывай устаревшую документацию;
-4. не выбирай молча удобную версию.
+1. record the conflict;
+2. state which source is stronger for the current behavior;
+3. do not hide the outdated documentation;
+4. do not silently pick the convenient version.
 
 ## Evidence index
 
-Все material statements в agent-блоке должны ссылаться на Evidence ID или inline evidence.
+All material statements in the agent block must reference an Evidence ID or inline evidence.
 
-Формат ID: `E-001`, `E-002`, ...
+ID format: `E-001`, `E-002`, ...
 
-## Запрещено
+## Forbidden
 
-- представлять inference как fact;
-- ссылаться на graphify как на источник истины;
-- делать вывод о production behavior только по локальному коду;
-- считать отсутствие найденного файла доказательством, если поиск был ограниченным;
-- превращать best practice в факт о проекте.
+- presenting an inference as a fact;
+- citing graphify as a source of truth;
+- concluding production behavior from local code alone;
+- treating a file not being found as proof, when the search was limited;
+- turning a best practice into a fact about the project.

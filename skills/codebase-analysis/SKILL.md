@@ -1,86 +1,86 @@
 ---
 name: codebase-analysis
-description: "Создаёт CURRENT_STATE.md: доказательное описание текущего состояния репозитория. Использовать только по явной просьбе пользователя запустить codebase-analysis. Не проектирует решение, не пишет код, не делает план реализации."
+description: "Creates CURRENT_STATE.md: an evidence-backed description of the current state of the repository. Use only when the user explicitly asks to run codebase-analysis. Does not design a solution, write code, or produce an implementation plan."
 disable-model-invocation: true
 ---
 
 # Codebase Analysis → CURRENT_STATE.md
 
-Навык создаёт или полностью обновляет `CURRENT_STATE.md` в директории, которую вернёт `pwd`.
+The skill creates or fully rewrites `CURRENT_STATE.md` in the directory returned by `pwd`.
 
-Задача навыка — описать **как система устроена сейчас**. Не предлагай будущее решение, рефакторинг, миграцию, новую архитектуру или план реализации.
+The skill's job is to describe **how the system works right now**. Do not propose a future solution, refactoring, migration, new architecture, or an implementation plan.
 
-Итоговый файл всегда состоит из двух блоков:
+The resulting file always consists of two blocks:
 
-1. **Блок 1. Для человека** — короткое понятное резюме без перегруза.
-2. **Блок 2. Для агента** — подробный доказательный снимок для `solution-design`, `planf3` и ревью.
+1. **Block 1. For the human** — a short, readable summary without overload.
+2. **Block 2. For the agent** — a detailed evidence-backed snapshot for `solution-design`, `planf3`, and review.
 
-## Жёсткие границы
+## Hard boundaries
 
-Разрешено менять только `CURRENT_STATE.md` и допустимые артефакты вспомогательного графа, если они создаются штатным инструментом.
+You may modify only `CURRENT_STATE.md` and the permitted artifacts of the auxiliary graph, if they are produced by the standard tool.
 
-Запрещено:
+Forbidden:
 
-- менять исходный код, тесты, конфиги, схемы, зависимости, документацию проекта;
-- создавать `SOLUTION.md`;
-- проектировать будущее изменение;
-- автоматически запускать `solution-design` или `planf3`;
-- делать коммиты, push, deploy, миграции, cloud write commands;
-- превращать анализ в аудит всего репозитория, если пользователь дал узкий фокус.
+- modifying source code, tests, configs, schemas, dependencies, or project documentation;
+- creating `SOLUTION.md`;
+- designing a future change;
+- automatically launching `solution-design` or `planf3`;
+- commits, pushes, deploys, migrations, cloud write commands;
+- turning the analysis into a full-repository audit when the user gave a narrow focus.
 
-## Контракт запуска
+## Launch contract
 
-1. Выполни `pwd` и считай его `analysis root`.
-2. Определи Git root, branch, revision и исходное состояние working tree. Если `pwd` не Git root — зафиксируй это честно.
-3. Прочитай локальные инструкции: `AGENTS.md`, `CLAUDE.md`, README, CONTRIBUTING, архитектурные документы, build/test/release docs.
-4. Найди релевантные manifests, schemas, package roots и code roots.
-5. Если пользователь дал фокус — анализируй глубоко только связанную область. Если фокуса нет — делай ограниченный overview, не file-by-file энциклопедию.
-6. Найди существующий `graphify` graph. Используй его только как навигационный индекс. Все существенные выводы проверяй по живому коду, тестам, конфигам и схемам.
-7. В конце сравни final working tree с initial baseline и явно отдели старые изменения от созданного `CURRENT_STATE.md`.
+1. Run `pwd` and treat it as the `analysis root`.
+2. Determine the Git root, branch, revision, and the initial working tree state. If `pwd` is not the Git root — record that honestly.
+3. Read local instructions: `AGENTS.md`, `CLAUDE.md`, README, CONTRIBUTING, architecture documents, build/test/release docs.
+4. Find the relevant manifests, schemas, package roots, and code roots.
+5. If the user gave a focus — analyze deeply only the related area. If there is no focus — produce a bounded overview, not a file-by-file encyclopedia.
+6. Find an existing `graphify` graph. Use it only as a navigation index. Verify every material conclusion against live code, tests, configs, and schemas.
+7. At the end, compare the final working tree with the initial baseline and explicitly separate pre-existing changes from the newly created `CURRENT_STATE.md`.
 
-## Управление контекстом
+## Context management
 
-Используй read-only сабагентов адаптивно:
+Use read-only subagents adaptively:
 
-- маленькая локальная область: 0–1;
-- несколько подсистем: 2–3;
-- большой monorepo: до 4.
+- small local area: 0–1;
+- several subsystems: 2–3;
+- large monorepo: up to 4.
 
-Не делай nested spawning. Каждый сабагент возвращает только факты, inference, unknowns, evidence и ограничения анализа. Итоговый документ пишет только координатор.
+No nested spawning. Each subagent returns only facts, inference, unknowns, evidence, and analysis limitations. Only the coordinator writes the final document.
 
-Если харнесс не предоставляет инструмент изолированных сабагентов (например, Pi) — выполняй эти роли inline отдельными проходами: проход выводит только findings в формате роли, затем координатор продолжает. Не имитируй запуск сабагентов и не утверждай, что они запускались.
+If the harness does not provide an isolated-subagent tool (for example, Pi) — perform these roles inline as separate passes: a pass outputs only findings in the role's format, then the coordinator continues. Do not simulate spawning subagents and do not claim they were launched.
 
-## Минимальность и защита от overengineering
+## Minimality and overengineering protection
 
-Даже анализ текущего состояния должен помогать будущим агентам **не строить лишнюю архитектуру**.
+Even an analysis of the current state must help future agents **avoid building unnecessary architecture**.
 
-Обязательно фиксируй:
+Always record:
 
-- существующие простые extension points;
-- локальные паттерны, которые стоит переиспользовать;
-- зависимости и абстракции, которых в проекте сейчас нет;
-- места, где проект намеренно живёт без глобального state/service/framework слоя;
-- ограничения сложности, которые будущие изменения должны уважать.
+- existing simple extension points;
+- local patterns worth reusing;
+- dependencies and abstractions the project currently does not have;
+- places where the project deliberately lives without a global state/service/framework layer;
+- complexity constraints that future changes must respect.
 
-Не называй отсутствие фреймворка или слоя проблемой. Описывай это как факт или осознанный текущий стиль, если он подтверждён кодом.
+Do not call the absence of a framework or layer a problem. Describe it as a fact or a deliberate current style, if the code confirms it.
 
-## Что читать
+## What to read
 
-- [analysis-workflow.md](references/analysis-workflow.md) — порядок анализа.
-- [evidence-policy.md](references/evidence-policy.md) — правила доказательств.
-- [repository-lenses.md](references/repository-lenses.md) — универсальные линзы для mobile/frontend/backend/game/CLI/library/etc.
-- [delegation-policy.md](references/delegation-policy.md) — сабагенты и лимиты контекста.
-- [CURRENT_STATE.template.md](references/CURRENT_STATE.template.md) — обязательная структура результата.
+- [analysis-workflow.md](references/analysis-workflow.md) — the order of analysis.
+- [evidence-policy.md](references/evidence-policy.md) — evidence rules.
+- [repository-lenses.md](references/repository-lenses.md) — universal lenses for mobile/frontend/backend/game/CLI/library/etc.
+- [delegation-policy.md](references/delegation-policy.md) — subagents and context limits.
+- [CURRENT_STATE.template.md](references/CURRENT_STATE.template.md) — the mandatory structure of the result.
 
-## Критерий завершения
+## Completion criteria
 
-`CURRENT_STATE.md` готов, только если:
+`CURRENT_STATE.md` is done only if:
 
-- есть короткий human-блок;
-- agent-блок содержит evidence-backed текущее состояние;
-- `FACT`, `INFERENCE`, `UNKNOWN` явно разделены;
-- зафиксированы контракты, инварианты, verification и unknowns;
-- зафиксирован simplicity baseline;
-- не предложено будущее решение;
-- проверен final working tree;
-- статус ровно один: `CURRENT_STATE_COMPLETE` или `CURRENT_STATE_PARTIAL`.
+- there is a short human block;
+- the agent block contains the evidence-backed current state;
+- `FACT`, `INFERENCE`, `UNKNOWN` are explicitly separated;
+- contracts, invariants, verification, and unknowns are recorded;
+- the simplicity baseline is recorded;
+- no future solution is proposed;
+- the final working tree has been checked;
+- the status is exactly one of: `CURRENT_STATE_COMPLETE` or `CURRENT_STATE_PARTIAL`.

@@ -1,48 +1,48 @@
-# Решение
+# Solution
 
-> Удали все подсказки и placeholder-строки перед финализацией. Не выдумывай секции ради формы. Пиши на языке пользователя. Код, symbols, API, commands и пути не переводи.
+> Remove all hints and placeholder lines before finalizing. Do not invent sections for form's sake. Write in the user's language. Do not translate code, symbols, APIs, commands, or paths.
 >
-> Секции без маркера — обязательное ядро. Секции с маркером `[IF: …]` заполняй только при выполнении условия — иначе удали секцию целиком, без `not applicable` и пустых таблиц.
+> Sections without a marker are the mandatory core. Fill sections marked `[IF: …]` only when the condition holds — otherwise delete the section entirely, with no `not applicable` and no empty tables.
 
-# Блок 1. Для человека
+# Block 1. For the human
 
-## 1. Что нужно сделать
+## 1. What needs to be done
 
-Простыми словами:
+In plain words:
 
-- проблема / желаемый результат;
-- кто или что получает пользу;
-- что изменится наблюдаемо;
-- что считается успехом.
+- the problem / desired outcome;
+- who or what benefits;
+- what will observably change;
+- what counts as success.
 
-## 2. Короткое решение
+## 2. Short solution
 
-Опиши выбранный подход в 5–12 предложениях. Без implementation checklist.
+Describe the chosen approach in 5–12 sentences. No implementation checklist.
 
-## 3. Что НЕ делаем
+## 3. What we are NOT doing
 
-Короткий список explicit non-goals. Особенно: что может показаться “полезным”, но не входит в эту итерацию.
+A short list of explicit non-goals. Especially: what might seem "useful" but is not part of this iteration.
 
-## 4. Почему это не overengineering
+## 4. Why this is not overengineering
 
-- минимальный вариант:
-- какие существующие паттерны переиспользуются:
-- новые зависимости/слои/state: `нет` или явное обоснование:
-- что вынесено в future work:
+- the minimal option:
+- which existing patterns are reused:
+- new dependencies/layers/state: `none` or an explicit justification:
+- what is moved to future work:
 
-## 5. Риски и проверки
+## 5. Risks and checks
 
-- Главные риски:
-- Как проверить результат:
-- Что может заблокировать PlanF3:
+- Main risks:
+- How to verify the result:
+- What could block PlanF3:
 
-**Статус**: `READY_FOR_PLANF3` / `BLOCKED` / `BLOCKED_BY_SCOPE_OVERDESIGN`
+**Status**: `READY_FOR_PLANF3` / `BLOCKED` / `BLOCKED_BY_SCOPE_OVERDESIGN`
 
 ---
 
-# Блок 2. Для агента
+# Block 2. For the agent
 
-## 1. Метаданные дизайна
+## 1. Design metadata
 
 - **Working directory**:
 - **Output path**:
@@ -50,7 +50,7 @@
 - **Pre-existing SOLUTION.md**:
 - **Design mode**: `existing` / `greenfield` / `hybrid`
 - **Task title**:
-- **Дата анализа**:
+- **Analysis date**:
 - **Relevant code roots**:
 - **Relevant Git revisions**:
 - **Initial working-tree state**:
@@ -65,7 +65,7 @@
 
 ## 2. Problem and desired outcome
 
-Разделяй `REQUIREMENT`, `FACT`, `INFERENCE`, `ASSUMPTION`, `UNKNOWN`.
+Separate `REQUIREMENT`, `FACT`, `INFERENCE`, `ASSUMPTION`, `UNKNOWN`.
 
 - Current problem / greenfield need:
 - Desired observable outcome:
@@ -81,7 +81,7 @@ Type: `FUNCTIONAL`, `QUALITY`, `CONSTRAINT`, `NON_GOAL`.
 
 ## 4. Relevant current context
 
-Для existing/hybrid: только релевантное к задаче, не копируй весь `CURRENT_STATE.md`.
+For existing/hybrid: only what is relevant to the task; do not copy the entire `CURRENT_STATE.md`.
 
 - Current behavior:
 - Affected components:
@@ -94,13 +94,13 @@ Type: `FUNCTIONAL`, `QUALITY`, `CONSTRAINT`, `NON_GOAL`.
 - Unknowns:
 - Evidence:
 
-Для greenfield: starting constraints, target platforms, available infrastructure, external systems.
+For greenfield: starting constraints, target platforms, available infrastructure, external systems.
 
 ## 5. Minimality contract
 
 ### 5.1 Smallest acceptable solution
 
-Опиши самый маленький вариант, который выполняет must-have requirements.
+Describe the smallest option that fulfills the must-have requirements.
 
 ### 5.2 Complexity budget
 
@@ -110,8 +110,8 @@ Type: `FUNCTIONAL`, `QUALITY`, `CONSTRAINT`, `NON_GOAL`.
 | New persistent state/storage | 0 unless data is the feature | | |
 | New subsystems/workers/schedulers | 0 unless directly required | | |
 | New global abstractions | 0 unless reused now | | |
-| Changed source files | минимально | | |
-| Docs | только контракт/поведение/запуск | | |
+| Changed source files | minimal | | |
+| Docs | contract/behavior/launch only | | |
 
 ### 5.3 Rejected overengineering
 
@@ -130,14 +130,14 @@ Type: `FUNCTIONAL`, `QUALITY`, `CONSTRAINT`, `NON_GOAL`.
 
 Type: `ASSUMPTION`, `UNKNOWN`.
 
-## 7. Design drivers [IF: был реальный выбор между существенно разными подходами]
+## 7. Design drivers [IF: there was a real choice between substantially different approaches]
 
 | Driver | Priority | Related requirement | Effect on design |
 |--------|----------|---------------------|------------------|
 
-## 8. Alternatives considered [IF: нетривиальная задача]
+## 8. Alternatives considered [IF: non-trivial task]
 
-Минимум — `Option 0: Minimal local extension / reuse existing pattern`.
+The minimum is `Option 0: Minimal local extension / reuse existing pattern`.
 
 ### Option 0: <minimal approach>
 
@@ -149,7 +149,7 @@ Type: `ASSUMPTION`, `UNKNOWN`.
 - Reversibility:
 - Selected/rejected because:
 
-Добавляй другие варианты только при реальном архитектурном выборе.
+Add other options only when there is a real architectural choice.
 
 ## 9. Recommended solution
 
@@ -165,24 +165,24 @@ Type: `ASSUMPTION`, `UNKNOWN`.
 
 ### 9.6 Failure behavior
 
-### 9.7 Relevant platform concerns [IF: платформенная линза материально влияет на решение]
+### 9.7 Relevant platform concerns [IF: a platform lens materially affects the solution]
 
-Используй только релевантные линзы: mobile/frontend/backend/game/CLI/library/data/infra/etc.
+Use only the relevant lenses: mobile/frontend/backend/game/CLI/library/data/infra/etc.
 
-### 9.8 Compatibility, migration, rollout [IF: меняется существующее поведение, данные или процесс выката]
+### 9.8 Compatibility, migration, rollout [IF: existing behavior, data, or the rollout process changes]
 
-### 9.9 Security, privacy, safety [IF: задача касается данных пользователей, доступа или безопасности]
+### 9.9 Security, privacy, safety [IF: the task touches user data, access, or safety]
 
-### 9.10 Observability, operations, supportability [IF: есть текущее требование к observability/operations]
+### 9.10 Observability, operations, supportability [IF: there is a current observability/operations requirement]
 
-Не добавляй observability platform без требования.
+Do not add an observability platform without a requirement.
 
-## 10. Operation semantics [IF: есть state-changing операции: UI actions, API calls, jobs, commands, game actions, migrations]
+## 10. Operation semantics [IF: there are state-changing operations: UI actions, API calls, jobs, commands, game actions, migrations]
 
 | Operation | Actor | Preconditions | Postcondition | Repeat/retry/concurrency | Missing target | Authorization/safety |
 |-----------|-------|---------------|---------------|--------------------------|----------------|----------------------|
 
-## 11. State lifecycle [IF: добавляется или меняется persisted/derived/cache/UI/game/session state]
+## 11. State lifecycle [IF: persisted/derived/cache/UI/game/session state is added or changed]
 
 | State/field | Source of truth | Created | Updated | Deleted | Related entity changes | Rollback/cleanup |
 |-------------|-----------------|---------|---------|---------|------------------------|------------------|
@@ -196,9 +196,9 @@ Type: `ASSUMPTION`, `UNKNOWN`.
 - External integrations:
 - Explicit exclusions:
 
-Не создавай file-by-file edit checklist.
+Do not create a file-by-file edit checklist.
 
-## 13. Decision log [IF: были решения с реальными альтернативами; иначе решение полностью описано в §9]
+## 13. Decision log [IF: there were decisions with real alternatives; otherwise the solution is fully described in §9]
 
 | ID | Decision | Drivers | Evidence | Consequences | Reversal strategy |
 |----|----------|---------|----------|--------------|-------------------|
@@ -208,16 +208,16 @@ Type: `ASSUMPTION`, `UNKNOWN`.
 | ID | Risk | Likelihood | Impact | Mitigation | Verification |
 |----|------|------------|--------|------------|--------------|
 
-Без процентов уверенности.
+No confidence percentages.
 
 ## 15. Validation strategy
 
 | Requirement | Design response | Verification type | Observable pass condition |
 |-------------|-----------------|-------------------|---------------------------|
 
-Не пиши просто “run tests”. Укажи observable результат.
+Do not write just "run tests". State the observable result.
 
-## 16. Challenger results [IF: challengers запускались]
+## 16. Challenger results [IF: challengers were run]
 
 ### Design Challenger
 
@@ -245,14 +245,14 @@ Type: `ASSUMPTION`, `UNKNOWN`.
 - Non-blocking assumptions:
 - Blocking unknowns:
 
-PlanF3 не должен выбирать архитектуру, public behavior, source of truth, auth policy, migration semantics или future scope.
+PlanF3 must not choose the architecture, public behavior, source of truth, auth policy, migration semantics, or future scope.
 
 ## 18. Readiness
 
-Статус ровно один:
+The status is exactly one of:
 
 - `READY_FOR_PLANF3`
 - `BLOCKED`
 - `BLOCKED_BY_SCOPE_OVERDESIGN`
 
-`READY_FOR_PLANF3` разрешён только если requirements проверяемы, current state установлен, high-impact unknowns закрыты или явно приняты, выбранное решение минимально достаточно, contracts/failure behavior/validation описаны, а future work не попал в текущий scope.
+`READY_FOR_PLANF3` is allowed only if the requirements are verifiable, the current state is established, the high-impact unknowns are closed or explicitly accepted, the chosen solution is minimally sufficient, the contracts/failure behavior/validation are described, and no future work has slipped into the current scope.

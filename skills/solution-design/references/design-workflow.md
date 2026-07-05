@@ -1,18 +1,18 @@
-# Порядок solution-design
+# Solution-design order
 
-## 0. Старт и scope
+## 0. Start and scope
 
-1. Выполни `pwd`.
-2. Определи output path для `SOLUTION.md`.
-3. Зафиксируй Git roots и initial status.
-4. Прочитай инструкции и релевантные docs/manifests.
-5. Определи mode: existing/greenfield/hybrid.
-6. Найди и классифицируй `CURRENT_STATE.md`.
-7. Определи coherent change set.
+1. Run `pwd`.
+2. Determine the output path for `SOLUTION.md`.
+3. Record the Git roots and the initial status.
+4. Read the instructions and the relevant docs/manifests.
+5. Determine the mode: existing/greenfield/hybrid.
+6. Find and classify `CURRENT_STATE.md`.
+7. Determine the coherent change set.
 
-## 1. Нормализуй требования
+## 1. Normalize the requirements
 
-Выдели:
+Extract:
 
 - `REQ-*` — functional requirements;
 - `NFR-*` — quality requirements;
@@ -21,67 +21,67 @@
 - `ASM-*` — assumptions;
 - `UNK-*` — unknowns.
 
-Не превращай догадку модели в требование пользователя.
+Do not turn a model's guess into a user requirement.
 
-## 2. Установи current context
+## 2. Establish the current context
 
-Для existing/hybrid проверь critical claims по живому коду, даже если есть `CURRENT_STATE.md`.
+For existing/hybrid, verify the critical claims against live code, even if `CURRENT_STATE.md` exists.
 
-Если baseline недостаточен для безопасного решения — `BLOCKED` и предложи focused `codebase-analysis`.
+If the baseline is insufficient for a safe solution — `BLOCKED`, and suggest a focused `codebase-analysis`.
 
-## 3. Сформулируй minimality contract
+## 3. Formulate the minimality contract
 
-До выбора решения заполни:
+Before choosing a solution, fill in:
 
-- smallest acceptable solution;
-- complexity budget;
+- the smallest acceptable solution;
+- the complexity budget;
 - explicit non-goals;
 - rejected overengineering;
-- future work parking lot.
+- the future work parking lot.
 
-## 4. Определи design drivers
+## 4. Determine the design drivers
 
-Только релевантные: correctness, simplicity, compatibility, reversibility, UX, performance, offline, latency, security, cost, delivery time, team familiarity, platform constraints.
+Only the relevant ones: correctness, simplicity, compatibility, reversibility, UX, performance, offline, latency, security, cost, delivery time, team familiarity, platform constraints.
 
-## 5. Рассмотри alternatives
+## 5. Consider alternatives
 
-Для нетривиальной задачи начни с `Option 0: minimal local extension / reuse existing pattern`.
+For a non-trivial task, start with `Option 0: minimal local extension / reuse existing pattern`.
 
-Другие варианты добавляй только при реальном архитектурном выборе.
+Add other options only when there is a real architectural choice.
 
-## 6. Выбери recommended solution
+## 6. Choose the recommended solution
 
-Опиши архитектуру достаточно точно, чтобы PlanF3 не переизобретал её.
+Describe the architecture precisely enough that PlanF3 does not reinvent it.
 
-Не включай file-by-file checklist, implementation phases, commits, task assignment.
+Do not include a file-by-file checklist, implementation phases, commits, task assignment.
 
-## 7. Закрой operation/state semantics
+## 7. Close the operation/state semantics
 
-Для применимых операций и состояния заполни таблицы Operation Semantics и State Lifecycle.
+For the applicable operations and state, fill in the Operation Semantics and State Lifecycle tables.
 
-## 8. Определи validation strategy
+## 8. Define the validation strategy
 
-Каждое material requirement должно иметь verification type и observable pass condition.
+Every material requirement must have a verification type and an observable pass condition.
 
 ## 9. Fresh challenge
 
-Для нетривиальной задачи запусти:
+For a non-trivial task, launch:
 
-1. Design Challenger;
-2. Lean Challenger.
+1. the Design Challenger;
+2. the Lean Challenger.
 
-Прими только findings с concrete requirement/contract/failure/cost/evidence.
+Accept only findings with a concrete requirement/contract/failure/cost/evidence.
 
-## 10. Исправь draft
+## 10. Fix the draft
 
-Внеси accepted corrections. Unsupported findings отклони с причиной.
+Apply the accepted corrections. Reject unsupported findings with a reason.
 
 ## 11. Readiness gate
 
-Запусти `design-readiness-gate.md`. Только после PASS ставь `READY_FOR_PLANF3`.
+Run `design-readiness-gate.md`. Only after PASS set `READY_FOR_PLANF3`.
 
-## 12. Финал
+## 12. Finish
 
-1. Запиши двухблоковый `SOLUTION.md`.
-2. Зафиксируй final working tree status.
-3. Укажи статус.
+1. Write the two-block `SOLUTION.md`.
+2. Record the final working tree status.
+3. State the status.

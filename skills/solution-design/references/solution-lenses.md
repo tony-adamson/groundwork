@@ -1,6 +1,6 @@
-# Универсальные линзы решения
+# Universal solution lenses
 
-Сначала определи system archetypes. Применяй только релевантные линзы.
+Determine the system archetypes first. Apply only the relevant lenses.
 
 ## Universal core
 
@@ -21,25 +21,25 @@
 
 App/scene lifecycle, navigation, UI state ownership, main-thread/actor isolation, persistence/offline/cache/sync, permissions, deep links, notifications, background execution, accessibility, performance, build/signing/distribution.
 
-Не добавляй global state manager, coordinator/router layer или cache engine без текущего requirement.
+Do not add a global state manager, a coordinator/router layer, or a cache engine without a current requirement.
 
 ## Frontend/Web
 
 Routing, rendering, component boundaries, state management, network contracts, SSR/CSR/SSG/hydration, browser storage, sessions, accessibility, responsive behavior, bundle size, hosting.
 
-Не добавляй state library/design system/data layer ради одного экрана.
+Do not add a state library/design system/data layer for the sake of one screen.
 
 ## Backend
 
 API/event contracts, persistence, transactions, consistency, auth/authz, validation, idempotency, jobs/queues, retries/timeouts, observability, deployment/rollback.
 
-Не добавляй queue/worker/cache/metrics/state machine без requirement.
+Do not add a queue/worker/cache/metrics/state machine without a requirement.
 
 ## Game
 
 Gameplay rule, input, game loop, deterministic state, physics, animation, save/load, assets, frame budget, platform controls.
 
-Не добавляй engine subsystem/tools pipeline ради одной механики.
+Do not add an engine subsystem/tools pipeline for the sake of one mechanic.
 
 ## CLI/Desktop
 
@@ -53,6 +53,6 @@ Public API, compatibility, error model, extension points, dependency surface, su
 
 Pipeline stages, artifacts, reproducibility, data lineage, orchestration, environment separation, credentials, rollback, monitoring, scheduling, cost.
 
-## Правило
+## Rule
 
-Каждая применённая линза должна помочь выбрать минимальное решение, а не расширить scope.
+Every applied lens must help choose the minimal solution, not expand the scope.

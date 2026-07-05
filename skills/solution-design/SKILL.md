@@ -1,96 +1,96 @@
 ---
 name: solution-design
-description: "Создаёт SOLUTION.md для одной конкретной задачи: минимальное достаточное решение, основанное на требованиях, CURRENT_STATE.md и живом коде. Использовать только по явной просьбе пользователя запустить solution-design. Не пишет код и не создаёт implementation plan."
+description: "Creates SOLUTION.md for one concrete task: the minimal sufficient solution, grounded in the requirements, CURRENT_STATE.md, and live code. Use only when the user explicitly asks to run solution-design. Does not write code and does not create an implementation plan."
 disable-model-invocation: true
 ---
 
 # Solution Design → SOLUTION.md
 
-Навык создаёт или полностью обновляет `SOLUTION.md` в директории, которую вернёт `pwd`.
+The skill creates or fully rewrites `SOLUTION.md` in the directory returned by `pwd`.
 
-`SOLUTION.md` отвечает на вопросы: **что изменить, почему именно так, какие контракты должны сохраниться, что не входит в scope, как доказать корректность**.
+`SOLUTION.md` answers the questions: **what to change, why this way, which contracts must survive, what is out of scope, how to prove correctness**.
 
-Он не отвечает на вопрос “какие файлы менять по шагам” — это задача `planf3`.
+It does not answer "which files to change, step by step" — that is `planf3`'s job.
 
-Итоговый файл всегда двухблоковый:
+The resulting file is always two-block:
 
-1. **Блок 1. Для человека** — короткий понятный summary без архитектурного перегруза.
-2. **Блок 2. Для агента** — полный контракт для планирования и реализации.
+1. **Block 1. For the human** — a short, readable summary without architectural overload.
+2. **Block 2. For the agent** — the complete contract for planning and implementation.
 
-## Жёсткие границы
+## Hard boundaries
 
-Разрешено менять только `SOLUTION.md`.
+You may modify only `SOLUTION.md`.
 
-Запрещено:
+Forbidden:
 
-- писать код;
-- менять тесты, конфиги, схемы, зависимости;
-- создавать implementation phases или file-by-file checklist;
-- автоматически запускать `codebase-analysis` или `planf3`;
-- перезаписывать `CURRENT_STATE.md`;
-- добавлять future-proofing в выбранное решение;
-- превращать локальную задачу в subsystem/platform/framework.
+- writing code;
+- modifying tests, configs, schemas, dependencies;
+- creating implementation phases or a file-by-file checklist;
+- automatically launching `codebase-analysis` or `planf3`;
+- overwriting `CURRENT_STATE.md`;
+- adding future-proofing to the chosen solution;
+- turning a local task into a subsystem/platform/framework.
 
-## Контракт запуска
+## Launch contract
 
-Навык требует конкретную задачу: feature, bug fix, refactoring goal, migration, product change, greenfield system.
+The skill requires a concrete task: a feature, a bug fix, a refactoring goal, a migration, a product change, a greenfield system.
 
-Если цели нет — не создавай общий архитектурный документ. Спроси задачу.
+If there is no goal — do not create a general architecture document. Ask for the task.
 
-В начале:
+At the start:
 
-1. Выполни `pwd`.
-2. Найди Git roots и initial working tree status.
-3. Прочитай локальные инструкции и релевантные docs/manifests.
-4. Найди и классифицируй `CURRENT_STATE.md`: `CURRENT`, `PARTIAL`, `STALE`, `IRRELEVANT`, `ABSENT`.
-5. Определи режим: `existing`, `greenfield`, `hybrid`.
-6. Определи, это один coherent change set или независимые workstreams.
+1. Run `pwd`.
+2. Find the Git roots and the initial working tree status.
+3. Read the local instructions and the relevant docs/manifests.
+4. Find and classify `CURRENT_STATE.md`: `CURRENT`, `PARTIAL`, `STALE`, `IRRELEVANT`, `ABSENT`.
+5. Determine the mode: `existing`, `greenfield`, `hybrid`.
+6. Determine whether this is one coherent change set or independent workstreams.
 
-## Основная целевая функция
+## Primary objective function
 
-Не “самая правильная архитектура”, а **минимальное достаточное решение**.
+Not "the most correct architecture", but the **minimal sufficient solution**.
 
-Решение лучше, если оно:
+A solution is better if it:
 
-- выполняет observable requirements;
-- сохраняет существующие контракты;
-- использует текущие паттерны проекта;
-- добавляет меньше файлов, зависимостей, слоёв и состояния;
-- проще ревьюится, тестируется и удаляется;
-- явно выносит future work за пределы текущей задачи.
+- fulfills the observable requirements;
+- preserves the existing contracts;
+- uses the project's current patterns;
+- adds fewer files, dependencies, layers, and state;
+- is easier to review, test, and delete;
+- explicitly moves future work outside the current task.
 
-Если корректное решение выглядит overbuilt, статус должен быть `BLOCKED_BY_SCOPE_OVERDESIGN`, а не `READY_FOR_PLANF3`.
+If the correct solution looks overbuilt, the status must be `BLOCKED_BY_SCOPE_OVERDESIGN`, not `READY_FOR_PLANF3`.
 
-## Обязательная минимальность
+## Mandatory minimality
 
-`SOLUTION.md` должен содержать:
+`SOLUTION.md` must contain:
 
-- минимальный приемлемый вариант;
+- the smallest acceptable option;
 - explicit non-goals;
 - rejected overengineering;
-- complexity budget;
-- future work parking lot;
-- объяснение каждого нового dependency/subsystem/persistent state/abstraction, если они нужны.
+- a complexity budget;
+- a future work parking lot;
+- a justification for every new dependency/subsystem/persistent state/abstraction, if any are needed.
 
-## Делегирование
+## Delegation
 
-Используй сабагентов только при пользе:
+Use subagents only when they add value:
 
 - context explorer;
 - domain/doc researcher;
 - design challenger;
 - lean challenger.
 
-Для нетривиального решения обязательны:
+For a non-trivial solution, these are mandatory:
 
-1. fresh Design Challenger — ищет correctness/contract gaps;
-2. Lean Challenger — ищет overengineering/scope creep.
+1. a fresh Design Challenger — hunts for correctness/contract gaps;
+2. a Lean Challenger — hunts for overengineering/scope creep.
 
-Оба работают read-only. Итоговый `SOLUTION.md` пишет только координатор.
+Both work read-only. Only the coordinator writes the final `SOLUTION.md`.
 
-Если харнесс не предоставляет инструмент изолированных сабагентов (например, Pi) — выполняй challengers inline: два отдельных прохода, каждый выводит только findings по формату из delegation-policy, затем координатор реагирует. Не имитируй запуск сабагентов и не утверждай, что они запускались.
+If the harness does not provide an isolated-subagent tool (for example, Pi) — run the challengers inline: two separate passes, each outputting only findings in the delegation-policy format, then the coordinator responds. Do not simulate spawning subagents and do not claim they were launched.
 
-## Что читать
+## What to read
 
 - [context-modes.md](references/context-modes.md)
 - [design-workflow.md](references/design-workflow.md)
@@ -100,14 +100,14 @@ disable-model-invocation: true
 - [delegation-policy.md](references/delegation-policy.md)
 - [SOLUTION.template.md](references/SOLUTION.template.md)
 
-## Критерий завершения
+## Completion criteria
 
-`SOLUTION.md` готов, только если:
+`SOLUTION.md` is done only if:
 
-- есть короткий human-блок;
-- agent-блок содержит проверяемые requirements, contracts, decisions, risks, validation;
-- выбран минимальный достаточный подход;
-- non-goals и rejected overengineering явные;
-- каждое значимое требование имеет observable verification;
-- PlanF3 не должен заново изобретать архитектуру;
-- финальный статус ровно один: `READY_FOR_PLANF3`, `BLOCKED`, `BLOCKED_BY_SCOPE_OVERDESIGN`.
+- there is a short human block;
+- the agent block contains verifiable requirements, contracts, decisions, risks, validation;
+- the minimal sufficient approach is chosen;
+- the non-goals and rejected overengineering are explicit;
+- every material requirement has observable verification;
+- PlanF3 will not have to reinvent the architecture;
+- the final status is exactly one of: `READY_FOR_PLANF3`, `BLOCKED`, `BLOCKED_BY_SCOPE_OVERDESIGN`.

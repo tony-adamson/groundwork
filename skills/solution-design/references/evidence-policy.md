@@ -1,51 +1,51 @@
-# Evidence policy для SOLUTION.md
+# Evidence policy for SOLUTION.md
 
-## Типы утверждений
+## Statement types
 
-- `REQUIREMENT` — требование пользователя, issue, PRD, product doc или обязательного стандарта.
-- `FACT` — подтверждено кодом, тестом, конфигом, schema, manifest, CURRENT_STATE evidence или official docs.
-- `INFERENCE` — вывод из нескольких facts.
-- `ASSUMPTION` — принятое условие без полного подтверждения.
-- `DECISION` — выбранное решение.
-- `UNKNOWN` — неизвестно или противоречиво.
+- `REQUIREMENT` — a requirement from the user, an issue, a PRD, a product doc, or a mandatory standard.
+- `FACT` — confirmed by code, a test, a config, a schema, a manifest, CURRENT_STATE evidence, or official docs.
+- `INFERENCE` — a conclusion drawn from several facts.
+- `ASSUMPTION` — an accepted condition without full confirmation.
+- `DECISION` — a chosen solution.
+- `UNKNOWN` — unknown or contradictory.
 
-Не используй проценты уверенности.
+Do not use confidence percentages.
 
 ## Current-state claims
 
-Для existing-system design material утверждения о текущем поведении должны ссылаться на:
+For existing-system design, material statements about the current behavior must reference:
 
-- CURRENT_STATE Evidence ID;
-- file path/symbol;
-- test;
-- schema/config/manifest;
-- безопасную команду;
-- official docs для внешнего поведения.
+- a CURRENT_STATE Evidence ID;
+- a file path/symbol;
+- a test;
+- a schema/config/manifest;
+- a safe command;
+- official docs for external behavior.
 
 ## External docs
 
-Для framework/platform/API behavior используй authoritative/version-specific docs. Блог или память модели не достаточно для material decision.
+For framework/platform/API behavior, use authoritative/version-specific docs. A blog post or the model's memory is not enough for a material decision.
 
 ## Traceability
 
-Каждое requirement должно иметь:
+Every requirement must have:
 
-- источник;
-- design response;
-- observable acceptance condition;
+- a source;
+- a design response;
+- an observable acceptance condition;
 - verification.
 
-Каждое decision должно иметь:
+Every decision must have:
 
 - drivers;
 - evidence;
 - consequences;
-- reversal strategy.
+- a reversal strategy.
 
-## Запрещено
+## Forbidden
 
-- “best practice” без drivers;
-- будущую потребность как текущее requirement;
-- consensus сабагентов как доказательство;
-- необоснованную новую архитектуру;
-- оставлять PlanF3 выбирать public behavior.
+- a "best practice" without drivers;
+- a future need presented as a current requirement;
+- subagent consensus as evidence;
+- unjustified new architecture;
+- leaving PlanF3 to choose public behavior.

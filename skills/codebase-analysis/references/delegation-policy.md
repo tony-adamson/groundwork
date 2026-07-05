@@ -1,53 +1,53 @@
-# Делегирование
+# Delegation
 
-Главный агент — координатор. Он пишет итоговый `CURRENT_STATE.md` и отвечает за качество evidence.
+The main agent is the coordinator. It writes the final `CURRENT_STATE.md` and is responsible for the quality of the evidence.
 
-## Когда использовать сабагентов
+## When to use subagents
 
-- Маленький локальный scope: 0–1 сабагент.
-- Несколько связанных частей: 2–3 сабагента.
-- Большой monorepo: до 4 сабагентов.
+- Small local scope: 0–1 subagents.
+- Several related parts: 2–3 subagents.
+- Large monorepo: up to 4 subagents.
 
-Не запускай сабагентов ради процесса. Не делай nested spawning.
+Do not launch subagents for the sake of process. No nested spawning.
 
-## Как назначать задачи
+## How to assign tasks
 
-Каждому сабагенту дай узкую read-only область:
+Give each subagent a narrow read-only area:
 
-- конкретный flow;
-- конкретный module/package;
+- a specific flow;
+- a specific module/package;
 - state/data flow;
 - tests/verification;
-- platform-specific lens;
-- dependency/config surface.
+- a platform-specific lens;
+- the dependency/config surface.
 
-Не передавай каждому весь репозиторий и весь граф.
+Do not hand each one the whole repository and the whole graph.
 
-## Формат ответа сабагента
+## Subagent response format
 
-Сабагент возвращает компактно:
+The subagent returns, compactly:
 
 1. Scope.
-2. Просмотренные файлы/symbols.
+2. Files/symbols examined.
 3. `FACT`.
 4. `INFERENCE`.
 5. `UNKNOWN`.
 6. Contracts/invariants.
 7. Evidence.
 8. Simplicity observations.
-9. Ограничения анализа.
+9. Analysis limitations.
 
-Ориентир: до 40 material findings или до 1200 слов.
+Guideline: up to 40 material findings or up to 1200 words.
 
-## Запреты для сабагентов
+## Subagent prohibitions
 
-Сабагент не должен:
+A subagent must not:
 
-- менять файлы;
-- создавать `CURRENT_STATE.md`;
-- предлагать решение;
-- делать план реализации;
-- возвращать большие куски исходников или логи;
-- исследовать чужую область.
+- modify files;
+- create `CURRENT_STATE.md`;
+- propose a solution;
+- produce an implementation plan;
+- return large chunks of source code or logs;
+- explore another subagent's area.
 
-Координатор обязан перепроверить важные утверждения перед включением в итоговый документ.
+The coordinator must re-verify important statements before including them in the final document.

@@ -1,158 +1,158 @@
-# Текущее состояние
+# Current state
 
-> Удали все подсказки перед финализацией. Не заполняй секции ради формы. Пиши на языке пользователя. Имена файлов, symbols, команды и API не переводи.
+> Remove all hints before finalizing. Do not fill sections for form's sake. Write in the user's language. Do not translate file names, symbols, commands, or APIs.
 >
-> Секции без маркера — обязательное ядро. Секции с маркером `[IF: …]` заполняй только при выполнении условия — иначе удали секцию целиком, без `not applicable` и пустых таблиц.
+> Sections without a marker are the mandatory core. Fill sections marked `[IF: …]` only when the condition holds — otherwise delete the section entirely, with no `not applicable` and no empty tables.
 
-# Блок 1. Для человека
+# Block 1. For the human
 
-## 1. Короткий вывод
+## 1. Short conclusion
 
-Кратко, 5–12 предложений:
+Briefly, 5–12 sentences:
 
-- что это за проект;
-- какие части реально проанализированы;
-- как система работает в общих чертах;
-- какие контракты важнее всего;
-- какие unknowns могут повлиять на будущую задачу;
-- можно ли использовать документ как вход для `$solution-design`.
+- what this project is;
+- which parts were actually analyzed;
+- how the system works in broad strokes;
+- which contracts matter most;
+- which unknowns could affect a future task;
+- whether the document can be used as input for `$solution-design`.
 
-## 2. Карта системы простыми словами
+## 2. System map in plain words
 
-- Основные части системы:
-- Главные entry points:
-- Где живёт состояние:
-- Как проверяется работа:
-- Что точно не найдено или не подтверждено:
+- Main parts of the system:
+- Main entry points:
+- Where state lives:
+- How the system is verified:
+- What was definitely not found or not confirmed:
 
-## 3. Важные ограничения для будущих изменений
+## 3. Important constraints for future changes
 
-- Что нельзя ломать:
-- Какие существующие паттерны лучше переиспользовать:
-- Где не стоит добавлять новую архитектуру без явной причины:
-- Какие вопросы потребуют отдельного focused analysis:
+- What must not be broken:
+- Which existing patterns are better reused:
+- Where new architecture should not be added without an explicit reason:
+- Which questions will require a separate focused analysis:
 
-**Статус**: `CURRENT_STATE_COMPLETE` или `CURRENT_STATE_PARTIAL`
+**Status**: `CURRENT_STATE_COMPLETE` or `CURRENT_STATE_PARTIAL`
 
 ---
 
-# Блок 2. Для агента
+# Block 2. For the agent
 
-## 1. Метаданные анализа
+## 1. Analysis metadata
 
 - **Analysis root** (`pwd`):
 - **Repository root**:
 - **Git revision**:
 - **Branch**:
-- **Дата анализа**:
-- **Фокус пользователя**:
+- **Analysis date**:
+- **User focus**:
 - **Initial working tree status**:
 - **Final working tree status**:
 - **Changes attributable to this analysis**:
 - **Repository graph status**: `graph used` / `graph generated and used` / `graph unavailable` / `graph stale` / `graph generation failed` / `graph not applicable`
-- **Ограничения анализа**:
+- **Analysis limitations**:
 
-## 2. Обзор системы
+## 2. System overview
 
-Для каждого существенного утверждения укажи тип: `FACT`, `INFERENCE` или `UNKNOWN`.
+For every material statement, state its type: `FACT`, `INFERENCE`, or `UNKNOWN`.
 
-- Назначение системы:
-- Основные сценарии:
-- Технологии, языки, runtime:
-- Build/package/release модель:
-- Общая архитектурная форма:
+- Purpose of the system:
+- Main scenarios:
+- Technologies, languages, runtime:
+- Build/package/release model:
+- Overall architectural shape:
 
-## 3. Структура репозитория
+## 3. Repository structure
 
-Не перечисляй все файлы. Описывай основные директории, modules, apps, packages, services, libraries, assets, schemas, build/config areas.
+Do not list every file. Describe the main directories, modules, apps, packages, services, libraries, assets, schemas, build/config areas.
 
 ## 4. Applied analysis lenses
 
-Укажи обнаруженные архетипы:
+List the detected archetypes:
 
 - mobile / frontend / backend / game / desktop / CLI / library / SDK / data / ML / infra / monorepo / mixed
 
-Для каждой линзы: `applied`, `partially applied`, `not detected`, `unknown`.
+For each lens: `applied`, `partially applied`, `not detected`, `unknown`.
 
-## 5. Релевантные компоненты
+## 5. Relevant components
 
-Для каждого важного компонента:
+For each important component:
 
 ### <component name>
 
-- **Тип утверждения**:
-- **Ответственность**:
-- **Ключевые файлы**:
-- **Ключевые symbols**:
-- **Зависимости**:
-- **Потребители**:
-- **Текущее поведение**:
+- **Statement type**:
+- **Responsibility**:
+- **Key files**:
+- **Key symbols**:
+- **Dependencies**:
+- **Consumers**:
+- **Current behavior**:
 - **Evidence**:
 - **Unknowns**:
 
 ## 6. Entry points
 
-| Entry point | Тип | Файл / symbol | Trigger | Evidence |
-|-------------|-----|---------------|---------|----------|
+| Entry point | Type | File / symbol | Trigger | Evidence |
+|-------------|------|---------------|---------|----------|
 
 ## 7. Control flow
 
-Для основных flows:
+For the main flows:
 
 ### <flow name>
 
 - Trigger:
-- Последовательность компонентов:
+- Component sequence:
 - Side effects:
 - Error handling:
 - Completion point:
 - Evidence:
 - Unknowns:
 
-## 8. Data/state flow [IF: в анализируемой области есть существенное состояние или данные]
+## 8. Data/state flow [IF: the analyzed area has material state or data]
 
-Опиши только существующее состояние:
+Describe only the state that exists:
 
-- источники данных;
-- ownership состояния;
+- data sources;
+- state ownership;
 - transformations;
 - storage/persistence/cache;
 - synchronization/offline/network;
 - transaction/lifecycle boundaries;
 - derived state;
-- места возможной потери/дублирования/рассинхронизации;
+- places where loss/duplication/desync is possible;
 - evidence.
 
-## 9. Существующие контракты
+## 9. Existing contracts
 
-Контрактом может быть UI/UX поведение, API, schema, file format, CLI output, save-game format, rendering rule, design token, accessibility behavior, protocol, build convention.
+A contract can be UI/UX behavior, an API, a schema, a file format, CLI output, a save-game format, a rendering rule, a design token, accessibility behavior, a protocol, a build convention.
 
 | Contract | Scope | Evidence | Consumers | Notes |
 |----------|-------|----------|-----------|-------|
 
-## 10. Существующие инварианты [IF: найдены инварианты, подтверждённые кодом, тестом или схемой]
+## 10. Existing invariants [IF: invariants confirmed by code, a test, or a schema were found]
 
 | Invariant | Scope | Backing code/test/config | Consequence if violated | Type |
 |-----------|-------|--------------------------|-------------------------|------|
 
-## 11. Dependencies and integrations [IF: зависимости или интеграции релевантны фокусу анализа]
+## 11. Dependencies and integrations [IF: dependencies or integrations are relevant to the analysis focus]
 
 | Dependency / integration | Purpose | Version | Config | Used at | Failure behavior | Evidence |
 |--------------------------|---------|---------|--------|---------|------------------|----------|
 
 ## 12. Simplicity baseline
 
-Этот раздел обязателен. Он нужен, чтобы будущие агенты не добавляли лишнюю архитектуру.
+This section is mandatory. It exists so that future agents do not add unnecessary architecture.
 
-- Существующие простые extension points:
-- Паттерны, которые проект уже использует:
-- Паттерны, которых проект явно не использует:
-- Зависимости, которые уже можно переиспользовать:
-- Новые зависимости, которые были бы необычны для проекта:
-- Где проект использует локальную state/logic вместо глобальной архитектуры:
-- Где future work не должен строиться без явного требования:
+- Existing simple extension points:
+- Patterns the project already uses:
+- Patterns the project explicitly does not use:
+- Dependencies already available for reuse:
+- New dependencies that would be unusual for this project:
+- Where the project uses local state/logic instead of global architecture:
+- Where future work must not be built without an explicit requirement:
 
-## 13. Cross-cutting concerns [IF: есть применимые или materially unknown concerns]
+## 13. Cross-cutting concerns [IF: there are applicable or materially unknown concerns]
 
 | Concern | Lens | Current arrangement | Files / symbols | Evidence | Gaps |
 |---------|------|---------------------|-----------------|----------|------|
@@ -163,11 +163,11 @@
 - Typecheck/build/lint:
 - Simulator/emulator/browser/device/manual smoke:
 - CI/release checks:
-- Что было безопасно запущено:
-- Что не запускалось и почему:
+- What was safely run:
+- What was not run and why:
 - Verification gaps:
 
-## 15. Evidence index [IF: material statements ссылаются на Evidence ID; при только inline evidence секцию удали]
+## 15. Evidence index [IF: material statements reference Evidence IDs; with inline evidence only, delete the section]
 
 | ID | Type | Statement | Evidence | Notes |
 |----|------|-----------|----------|-------|
@@ -179,13 +179,13 @@ Type: `FACT`, `INFERENCE`, `UNKNOWN`.
 | Unknown | Why unconfirmed | Affected area | What would confirm it |
 |---------|-----------------|---------------|-----------------------|
 
-## 17. Handoff для solution-design
+## 17. Handoff for solution-design
 
-- Проанализированный scope:
-- Самые важные контракты:
-- Самые важные инварианты:
+- Analyzed scope:
+- Most important contracts:
+- Most important invariants:
 - Simplicity constraints:
-- Unknowns, которые могут заблокировать дизайн:
-- Рекомендуемый focused `$codebase-analysis`, если нужен:
+- Unknowns that could block the design:
+- Recommended focused `$codebase-analysis`, if needed:
 
-**Статус**: `CURRENT_STATE_COMPLETE` или `CURRENT_STATE_PARTIAL`
+**Status**: `CURRENT_STATE_COMPLETE` or `CURRENT_STATE_PARTIAL`

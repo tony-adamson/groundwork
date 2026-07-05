@@ -1,16 +1,16 @@
-# Контекстные режимы
+# Context modes
 
-## Несколько пожеланий
+## Multiple requests
 
-Объединяй изменения в один `SOLUTION.md`, только если они имеют общую цель, область системы, contract/data/release boundary или техническую зависимость.
+Combine changes into one `SOLUTION.md` only if they share a goal, a system area, a contract/data/release boundary, or a technical dependency.
 
-Если изменения независимы — не создавай искусственную архитектуру. Раздели на workstreams или верни `BLOCKED` с рекомендуемыми отдельными вызовами.
+If the changes are independent — do not create artificial architecture. Split them into workstreams or return `BLOCKED` with recommended separate invocations.
 
 ## Existing-system mode
 
-Используй, когда есть код, который будет изменён.
+Use when there is code that will be changed.
 
-Обязано учитывать:
+Must account for:
 
 - current behavior;
 - contracts/invariants;
@@ -19,32 +19,32 @@
 - regression surface;
 - simplicity baseline.
 
-Если `CURRENT_STATE.md` отсутствует, выполни focused discovery. Не создавай `CURRENT_STATE.md` автоматически.
+If `CURRENT_STATE.md` is absent, perform a focused discovery. Do not create `CURRENT_STATE.md` automatically.
 
-Если baseline невозможно установить — `BLOCKED` с точным запросом `codebase-analysis <focus>`.
+If the baseline cannot be established — `BLOCKED` with a precise `codebase-analysis <focus>` request.
 
 ## Greenfield mode
 
-Используй, когда production-кода ещё нет.
+Use when there is no production code yet.
 
-Исходи из требований, платформ, ограничений, данных, безопасности, бюджета, сложности эксплуатации и компетенций команды.
+Start from the requirements, platforms, constraints, data, security, budget, operational complexity, and team competencies.
 
-Не выбирай технологию “потому что популярна”. Каждое важное решение связывай с design drivers и minimality contract.
+Do not choose a technology "because it is popular". Tie every important decision to the design drivers and the minimality contract.
 
 ## Hybrid mode
 
-Используй, когда есть skeleton/prototype/часть системы или новый клиент к существующему backend.
+Use when there is a skeleton/prototype/part of the system, or a new client for an existing backend.
 
-Существующие части — constraints. Отсутствующие части — greenfield.
+The existing parts are constraints. The missing parts are greenfield.
 
 ## CURRENT_STATE.md
 
-Статусы:
+Statuses:
 
-- `CURRENT` — относится к задаче и актуальному коду;
-- `PARTIAL` — полезен, но не покрывает весь affected scope;
-- `STALE` — релевантный код изменился после анализа;
-- `IRRELEVANT` — другой project/subsystem;
-- `ABSENT` — нет подходящего документа.
+- `CURRENT` — relates to the task and the up-to-date code;
+- `PARTIAL` — useful, but does not cover the entire affected scope;
+- `STALE` — the relevant code changed after the analysis;
+- `IRRELEVANT` — a different project/subsystem;
+- `ABSENT` — no suitable document.
 
-`CURRENT_STATE_COMPLETE` не означает, что документ покрывает любую новую задачу. Смотри declared scope и user focus.
+`CURRENT_STATE_COMPLETE` does not mean the document covers any new task. Check the declared scope and the user focus.

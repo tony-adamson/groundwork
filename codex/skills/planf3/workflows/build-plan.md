@@ -1,102 +1,102 @@
 # Build Plan
 
-Исполняй только план со статусом `READY_FOR_BUILD`.
+Execute only a plan with the `READY_FOR_BUILD` status.
 
 Task markers: `[]` idle · `[wip]` in progress · `[x]` complete · `[f]` failed.
 
 ## 0. Readiness
 
-1. Найди план из запроса.
-2. Откажись строить, если статус не `READY_FOR_BUILD`.
-3. Прочитай `SOLUTION.md`, `CURRENT_STATE.md`, локальные инструкции и весь plan agent-block.
-4. Зафиксируй branch, revision, initial git status, tracked/untracked changes.
-5. Не трогай чужие изменения.
-6. Поставь `BUILD_IN_PROGRESS` только после этих проверок.
+1. Find the plan from the request.
+2. Refuse to build if the status is not `READY_FOR_BUILD`.
+3. Read `SOLUTION.md`, `CURRENT_STATE.md`, the local instructions, and the entire plan agent block.
+4. Record the branch, revision, initial git status, tracked/untracked changes.
+5. Do not touch other people's changes.
+6. Set `BUILD_IN_PROGRESS` only after these checks.
 
 ## 1. Minimal diff execution
 
-Реализуй самый маленький diff, который выполняет план.
+Implement the smallest diff that fulfills the plan.
 
-Запрещено без возврата в `$solution-design`:
+Forbidden without going back to `$solution-design`:
 
-- добавлять dependency;
-- добавлять persistent state;
-- добавлять subsystem/framework/worker/scheduler;
-- менять public contract;
-- расширять scope;
-- делать unrelated refactor;
-- реализовывать Future Work.
+- adding a dependency;
+- adding persistent state;
+- adding a subsystem/framework/worker/scheduler;
+- changing a public contract;
+- expanding the scope;
+- doing an unrelated refactor;
+- implementing Future Work.
 
-Если план кажется overbuilt — остановись с `SCOPE_OVERDESIGN`.
+If the plan looks overbuilt — stop with `SCOPE_OVERDESIGN`.
 
-## 2. Фазовое выполнение
+## 2. Phased execution
 
-Для каждой фазы:
+For each phase:
 
-1. Перечитай связанные requirements и constraints.
-2. Реализуй только scope фазы.
-3. Запусти phase validation.
-4. Проверь diff фазы.
-5. Для нетривиальной фазы запусти fresh read-only verifier.
-6. Исправь только подтверждённые blocking findings.
-7. Отметь фазу `[x]` только после validation + verifier approval.
+1. Re-read the related requirements and constraints.
+2. Implement only the phase's scope.
+3. Run the phase validation.
+4. Check the phase diff.
+5. For a non-trivial phase, run a fresh read-only verifier.
+6. Fix only confirmed blocking findings.
+7. Mark the phase `[x]` only after validation + verifier approval.
 
-Не запускай параллельно зависимые фазы.
+Do not run dependent phases in parallel.
 
-## 3. Сабагенты
+## 3. Subagents
 
-Используй адаптивно:
+Use adaptively:
 
-- маленький проект: обычно 0–1 implementer;
-- verifier обязателен для рискованных фаз;
-- nested spawning запрещён.
+- small project: usually 0–1 implementers;
+- a verifier is mandatory for risky phases;
+- nested spawning is forbidden.
 
-Implementer получает конкретную фазу, allowed files, forbidden changes, validation commands и expected result.
+The implementer receives a specific phase, allowed files, forbidden changes, validation commands, and the expected result.
 
-Verifier работает read-only и проверяет только correctness/scope/minimality текущей фазы.
+The verifier works read-only and checks only the correctness/scope/minimality of the current phase.
 
 ## 4. Repair loops
 
-Не делай бесконечный цикл fix/test.
+Do not run an endless fix/test loop.
 
-- 2 попытки на одну фазовую проблему;
-- после повторного провала — `[f]` и `BUILD_FAILED` или `BLOCKED` с причиной.
+- 2 attempts per phase problem;
+- after a repeated failure — `[f]` and `BUILD_FAILED`, or `BLOCKED` with a reason.
 
-Если причина требует design decision — `BLOCKED_FOR_SOLUTION_AMENDMENT`.
+If the cause requires a design decision — `BLOCKED_FOR_SOLUTION_AMENDMENT`.
 
 ## 5. Stop conditions
 
-Остановись, если:
+Stop if:
 
-- нужен новый architecture/public behavior/source-of-truth decision;
-- план противоречит `SOLUTION.md` или текущему коду;
-- required capability недоступна;
-- validation нельзя сделать deterministic;
-- нужна destructive/external/production action;
-- реализация затронет unrelated user changes;
-- minimality budget нарушается без одобрения;
-- фактический diff превысил `Estimated LOC net` или files-to-change budget плана в 2 раза — остановись, покажи `git diff --stat`, объясни причину и жди решения.
+- a new architecture/public behavior/source-of-truth decision is needed;
+- the plan contradicts `SOLUTION.md` or the current code;
+- a required capability is unavailable;
+- validation cannot be made deterministic;
+- a destructive/external/production action is needed;
+- the implementation would touch unrelated user changes;
+- the minimality budget is violated without approval;
+- the actual diff exceeded the plan's `Estimated LOC net` or files-to-change budget by 2× — stop, show `git diff --stat`, explain the reason, and wait for a decision.
 
 ## 6. Final validation
 
-1. Запусти все global validation commands.
-2. Сопоставь каждое material requirement с implementation evidence и pass condition.
-3. Проверь tracked/untracked diff.
-4. Убедись, что excluded areas не менялись.
-5. Запусти финальный fresh read-only code review; если отдельный reviewer недоступен — сделай отдельный inline-проход, выводящий только findings.
-6. Если diff выглядит раздутым — выполни simplify/reuse pass и применяй только правки, которые уменьшают scope без потери требований.
+1. Run all global validation commands.
+2. Match every material requirement to implementation evidence and a pass condition.
+3. Check the tracked/untracked diff.
+4. Make sure the excluded areas did not change.
+5. Run a final fresh read-only code review; if a separate reviewer is unavailable — do a separate inline pass that outputs only findings.
+6. If the diff looks bloated — run a simplify/reuse pass and apply only fixes that reduce scope without losing requirements.
 
 ## 7. Final report
 
-На языке пользователя:
+In the user's language:
 
-- итоговый статус;
+- the final status;
 - `git diff --stat` (tracked + untracked);
-- сравнение фактического diff с `Estimated LOC net` и files-to-change budget плана;
-- какие requirements выполнены;
-- validation commands + результаты (честно: упало — показать вывод, пропущено — сказать);
+- a comparison of the actual diff with the plan's `Estimated LOC net` and files-to-change budget;
+- which requirements are fulfilled;
+- validation commands + results (honestly: if something failed — show the output; if something was skipped — say so);
 - verifier/reviewer findings;
 - removed/rejected overengineering;
-- **"Что проверить на ревью"**: 3–5 конкретных рисков и как проверить их руками;
+- **"What to check in review"**: 3–5 concrete risks and how to check them by hand;
 - remaining risks/blockers;
-- подтверждение, что production/destructive actions не выполнялись.
+- confirmation that no production/destructive actions were performed.

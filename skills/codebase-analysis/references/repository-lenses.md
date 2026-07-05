@@ -1,10 +1,10 @@
-# Универсальные линзы репозитория
+# Universal repository lenses
 
-Сначала определи архетипы. Один репозиторий может быть смешанным.
+Determine the archetypes first. One repository can be mixed.
 
-## Универсальное ядро
+## Universal core
 
-Применяется всегда:
+Always applies:
 
 - purpose;
 - structure;
@@ -49,6 +49,6 @@ Public API, source/binary compatibility, extension points, dependency surface, e
 
 Pipelines, inputs/outputs, artifacts, reproducibility, data lineage, orchestration, environment separation, credentials, state ownership, rollback, monitoring, scheduling, cost.
 
-## Правило
+## Rule
 
-Не создавай длинные пустые `not applicable` секции. Укажи применённые линзы компактно и раскрывай только релевантное.
+Do not create long empty `not applicable` sections. List the applied lenses compactly and expand only what is relevant.

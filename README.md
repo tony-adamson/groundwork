@@ -22,8 +22,8 @@ The skills encode a minimal-sufficient-change philosophy: no future-proofing, no
 abstractions without a second real call site, budgets on diff size, and explicit stop
 rules when the actual change outgrows the estimate.
 
-> Skill instructions are currently written in Russian. File names, statuses, commands,
-> and all machine-readable parts are English.
+> The skills produce artifacts **in the user's language** — the agent detects it from
+> the conversation. File names, statuses, symbols, and commands are never translated.
 
 ## Layout
 

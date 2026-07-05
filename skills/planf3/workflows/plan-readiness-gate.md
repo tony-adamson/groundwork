@@ -1,49 +1,49 @@
 # Plan Readiness Gate
 
-Запускается перед `READY_FOR_BUILD`.
+Runs before `READY_FOR_BUILD`.
 
 ## 1. Traceability gate
 
-Каждое material requirement/decision из `SOLUTION.md` должно иметь:
+Every material requirement/decision from `SOLUTION.md` must have:
 
-- одну или несколько задач;
-- validation step;
-- observable pass condition.
+- one or more tasks;
+- a validation step;
+- an observable pass condition.
 
-Нельзя оставлять requirement только в prose.
+A requirement must not exist only in prose.
 
 ## 2. Design boundary gate
 
-План не должен вводить или выбирать:
+The plan must not introduce or choose:
 
-- новую архитектуру;
+- a new architecture;
 - public behavior;
-- auth policy;
-- source of truth;
+- an auth policy;
+- a source of truth;
 - persistence semantics;
 - migration semantics;
 - lifecycle rules;
 - fallback contracts.
 
-Если это нужно — `BLOCKED_FOR_SOLUTION_AMENDMENT`.
+If that is needed — `BLOCKED_FOR_SOLUTION_AMENDMENT`.
 
 ## 3. Minimality gate
 
-Проверь, что план:
+Check that the plan:
 
-- реализует smallest sufficient diff;
-- не добавляет dependency/subsystem/state/abstraction вне `SOLUTION.md`;
-- не реализует future work;
-- не рефакторит unrelated code;
-- имеет files-to-change budget и `Estimated LOC net`;
-- не строит платформу для локальной задачи;
-- включает rejected overengineering.
+- implements the smallest sufficient diff;
+- does not add a dependency/subsystem/state/abstraction outside `SOLUTION.md`;
+- does not implement future work;
+- does not refactor unrelated code;
+- has a files-to-change budget and an `Estimated LOC net`;
+- does not build a platform for a local task;
+- includes the rejected overengineering.
 
-Если корректно, но overbuilt — `BLOCKED_BY_SCOPE_OVERDESIGN`.
+If correct but overbuilt — `BLOCKED_BY_SCOPE_OVERDESIGN`.
 
 ## 4. Operation semantics gate
 
-Для каждой material operation/action/job/command/game action определены:
+For every material operation/action/job/command/game action, the following are defined:
 
 - inputs;
 - preconditions;
@@ -56,7 +56,7 @@
 
 ## 5. State lifecycle gate
 
-Для нового/изменённого state/storage/cache/relationship/snapshot/artifact определены:
+For new/changed state/storage/cache/relationship/snapshot/artifact, the following are defined:
 
 - creation;
 - update;
@@ -67,36 +67,36 @@
 
 ## 6. Executable validation gate
 
-Каждая behavioral validation имеет:
+Every behavioral validation has:
 
 - setup;
-- command;
-- assertion;
+- a command;
+- an assertion;
 - cleanup;
-- expected exit status.
+- an expected exit status.
 
-Long-running interactive command не является acceptance command.
+A long-running interactive command is not an acceptance command.
 
 ## 7. Command sanity gate
 
-Проверь команды:
+Check the commands:
 
-- завершаются конечным образом;
-- используют правильные path/quoting;
-- имеют правильную семантику exit code;
-- не дают false positive/false negative;
-- учитывают tracked и untracked files;
-- не выполняют destructive/external side effects.
+- they terminate;
+- they use correct paths/quoting;
+- they have correct exit code semantics;
+- they do not produce false positives/false negatives;
+- they account for tracked and untracked files;
+- they perform no destructive/external side effects.
 
 ## 8. Scope gate
 
-Каждая planned file имеет причину. Каждая задача маппится на `SOLUTION.md` или validation. Исключённые области остаются исключёнными.
+Every planned file has a reason. Every task maps to `SOLUTION.md` or validation. The excluded areas stay excluded.
 
 ## 9. Result
 
-Внутренний результат:
+Internal result:
 
 - `PASS`
 - `FAIL: <failed gates>`
 
-`READY_FOR_BUILD` разрешён только после `PASS`.
+`READY_FOR_BUILD` is allowed only after `PASS`.
