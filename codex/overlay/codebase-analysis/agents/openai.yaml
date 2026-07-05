@@ -1,0 +1,6 @@
+interface:
+  display_name: "Codebase Analysis"
+  short_description: "Document current repo state with evidence"
+  default_prompt: "Use $codebase-analysis to create CURRENT_STATE.md for this repository or a focused area."
+policy:
+  allow_implicit_invocation: false

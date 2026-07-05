@@ -1,0 +1,6 @@
+interface:
+  display_name: "Solution Design"
+  short_description: "Design minimal software changes"
+  default_prompt: "Use $solution-design to create a minimal evidence-based SOLUTION.md before planning this change."
+policy:
+  allow_implicit_invocation: false
