@@ -1,5 +1,7 @@
 # groundwork
 
+**English** | [Русский](README.ru.md)
+
 Evidence-first process skills for coding agents: survey the codebase, design the
 minimal solution, compile it into the smallest executable plan — and only then build.
 
@@ -41,6 +43,8 @@ Claude-only frontmatter keys dropped, and a couple of harness-specific lines
 ## Install
 
 ```bash
+git clone https://github.com/tony-adamson/groundwork
+cd groundwork
 ./install.sh --all          # Claude Code + Codex + Pi
 ./install.sh --claude       # only ~/.claude/skills
 ./install.sh --codex        # rebuild Codex variant, sync to ~/.codex/skills
@@ -49,6 +53,21 @@ Claude-only frontmatter keys dropped, and a couple of harness-specific lines
 
 Syncing uses `rsync --delete`: the local copies are mirrors and must not hold
 unique content. To update later: `git pull && ./install.sh --all`.
+
+### Agent install
+
+Paste this to your coding agent (Claude Code, Codex CLI, etc.):
+
+```text
+Install the groundwork skills from https://github.com/tony-adamson/groundwork:
+1. Clone the repo to a permanent location (e.g. ~/tools/groundwork) — it stays
+   as the update source, do not delete it after install.
+2. Run ./install.sh with the flags for my harnesses:
+   --claude for Claude Code, --codex for Codex CLI, --pi for Pi, --all for everything.
+3. Verify: the skills codebase-analysis, solution-design and planf3 appear in
+   the harness skills directory (e.g. ls ~/.claude/skills).
+To update later: git pull in the clone, then re-run ./install.sh.
+```
 
 ## Editing
 
@@ -76,6 +95,13 @@ planf3             →  implementation plan (approve, then Build Plan)
 For small tasks, skip straight to `planf3` or just implement — the skills are
 deliberately gated to explicit invocation and refuse casual use.
 
+## Origins
+
+The `planf3` skill is not an original work: it is an adapted and reworked
+version of [disler/planf3](https://github.com/disler/planf3) by IndyDevDan
+(MIT License). `codebase-analysis` and `solution-design` are original but
+designed to feed it.
+
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE); it retains the upstream planf3 copyright notice.

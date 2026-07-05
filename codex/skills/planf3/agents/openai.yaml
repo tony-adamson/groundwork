@@ -1,0 +1,6 @@
+interface:
+  display_name: "PlanF3"
+  short_description: "Compile a minimal implementation plan"
+  default_prompt: "Use $planf3 to create a minimal implementation plan from the approved SOLUTION.md or a concrete task."
+policy:
+  allow_implicit_invocation: false
