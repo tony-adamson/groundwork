@@ -75,6 +75,9 @@ def convert_file(rel: str, text: str, skill: str) -> str:
 
 
 def main() -> None:
+    for rel in LINE_OVERRIDES:
+        if not (SRC / rel).is_file():
+            sys.exit(f"LINE_OVERRIDES references missing file: {rel}")
     if OUT.exists():
         shutil.rmtree(OUT)
     for skill in SKILLS:

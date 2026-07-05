@@ -38,9 +38,13 @@ for arg in "$@"; do
   esac
 done
 
-$do_claude && sync_tree "$REPO/skills" "$HOME/.claude/skills"
+if $do_claude; then
+  sync_tree "$REPO/skills" "$HOME/.claude/skills"
+fi
 if $do_codex; then
   python3 "$REPO/tools/build_codex.py"
   sync_tree "$REPO/codex/skills" "$HOME/.codex/skills"
 fi
-$do_pi && sync_tree "$REPO/skills" "$HOME/.pi/agent/skills"
+if $do_pi; then
+  sync_tree "$REPO/skills" "$HOME/.pi/agent/skills"
+fi
