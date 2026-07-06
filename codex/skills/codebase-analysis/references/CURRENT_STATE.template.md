@@ -1,6 +1,6 @@
 # Current state
 
-> Remove all hints before finalizing. Do not fill sections for form's sake. Write in the user's language. Do not translate file names, symbols, commands, or APIs.
+> Remove all hints before finalizing. Do not fill sections for form's sake. Write the document in the user's language (the language of their request), not the language of this template — translate the section headings too. Do not translate file names, symbols, commands, statuses, or APIs.
 >
 > Sections without a marker are the mandatory core. Fill sections marked `[IF: …]` only when the condition holds — otherwise delete the section entirely, with no `not applicable` and no empty tables.
 

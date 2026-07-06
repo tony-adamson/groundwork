@@ -100,6 +100,10 @@ If the harness does not provide an isolated-subagent tool (for example, Pi) — 
 - [delegation-policy.md](references/delegation-policy.md)
 - [SOLUTION.template.md](references/SOLUTION.template.md)
 
+## Language
+
+Write `SOLUTION.md` and all reports in the user's language — the language of the user's request and conversation, **not** the language of these instructions. If the request is in Russian, the artifact is in Russian. Do not translate file names, symbols, commands, statuses, or APIs.
+
 ## Completion criteria
 
 `SOLUTION.md` is done only if:

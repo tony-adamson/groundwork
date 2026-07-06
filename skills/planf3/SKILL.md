@@ -93,4 +93,4 @@ If the harness does not provide an isolated-subagent tool (for example, Pi) — 
 
 ## Language
 
-Write plans and reports in the user's language. Do not translate file names, commands, APIs, symbols, or code identifiers.
+Write plans and reports in the user's language — the language of the user's request and conversation, **not** the language of these instructions. If the request is in Russian, the plan is in Russian. Do not translate file names, commands, APIs, symbols, statuses, or code identifiers.

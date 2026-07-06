@@ -1,6 +1,6 @@
 # Solution
 
-> Remove all hints and placeholder lines before finalizing. Do not invent sections for form's sake. Write in the user's language. Do not translate code, symbols, APIs, commands, or paths.
+> Remove all hints and placeholder lines before finalizing. Do not invent sections for form's sake. Write the document in the user's language (the language of their request), not the language of this template — translate the section headings too. Do not translate code, symbols, APIs, commands, statuses, or paths.
 >
 > Sections without a marker are the mandatory core. Fill sections marked `[IF: …]` only when the condition holds — otherwise delete the section entirely, with no `not applicable` and no empty tables.
 

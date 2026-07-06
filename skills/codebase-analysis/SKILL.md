@@ -72,6 +72,10 @@ Do not call the absence of a framework or layer a problem. Describe it as a fact
 - [delegation-policy.md](references/delegation-policy.md) — subagents and context limits.
 - [CURRENT_STATE.template.md](references/CURRENT_STATE.template.md) — the mandatory structure of the result.
 
+## Language
+
+Write `CURRENT_STATE.md` and all reports in the user's language — the language of the user's request and conversation, **not** the language of these instructions. If the request is in Russian, the artifact is in Russian. Do not translate file names, symbols, commands, statuses, or APIs.
+
 ## Completion criteria
 
 `CURRENT_STATE.md` is done only if:
