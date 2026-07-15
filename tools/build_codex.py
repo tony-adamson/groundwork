@@ -22,17 +22,18 @@ SRC = REPO / "skills"
 OVERLAY = REPO / "codex" / "overlay"
 OUT = REPO / "codex" / "skills"
 
-SKILLS = ["codebase-analysis", "solution-design", "planf3"]
+SKILLS = ["codebase-analysis", "solution-design", "planf3", "ops-review"]
 
 CODEX_DESCRIPTIONS = {
     "codebase-analysis": "Use when explicitly asked for $codebase-analysis to create or fully update CURRENT_STATE.md with evidence for the current repository or focused area. Do not use for casual code questions, reviews, implementation, debugging, solution design, or planning.",
     "solution-design": "Use when explicitly asked for $solution-design to create SOLUTION.md for one concrete software change before implementation planning. Produces a minimal evidence-based design; does not write code or create an implementation plan.",
     "planf3": "Use when explicitly asked for $planf3 to create, update, or build a minimal Markdown implementation plan from SOLUTION.md or a concrete approved task. Do not use for solution design or speculative architecture.",
+    "ops-review": "Use when explicitly asked for $ops-review to review an implemented change for silent operational failures: missing timeouts, unbounded resources, connection leaks, non-idempotent retries, slow-dependency degradation. Read-only findings report; does not fix code and does not replace load testing.",
 }
 
 CLAUDE_ONLY_KEYS = ("disable-model-invocation", "argument-hint")
 
-SKILL_REF = re.compile(r"`(graphify|codebase-analysis|solution-design|planf3)`")
+SKILL_REF = re.compile(r"`(graphify|codebase-analysis|solution-design|planf3|ops-review)`")
 
 # Exact whole-line replacements for wording that only makes sense in Claude Code.
 # Keyed by path relative to skills/. Applied after the $-prefix pass.

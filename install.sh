@@ -5,7 +5,7 @@
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILLS=(codebase-analysis solution-design planf3)
+SKILLS=(codebase-analysis solution-design planf3 ops-review)
 
 usage() {
   echo "usage: $0 [--claude] [--codex] [--pi] [--all]"

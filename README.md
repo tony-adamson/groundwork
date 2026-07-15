@@ -5,13 +5,14 @@
 Evidence-first process skills for coding agents: survey the codebase, design the
 minimal solution, compile it into the smallest executable plan — and only then build.
 
-The pipeline is three skills, each producing one reviewable Markdown artifact:
+The core pipeline is three skills, each producing one reviewable Markdown artifact, plus a post-implementation gate:
 
 | Skill | Artifact | Answers |
 |---|---|---|
 | `codebase-analysis` | `CURRENT_STATE.md` | How does the system work **right now**? Evidence only, no proposals. |
 | `solution-design` | `SOLUTION.md` | What to change, why this way, which contracts must survive, what is out of scope. |
 | `planf3` | `specs/<name>-implementation-plan.md` | The smallest executable plan; also executes an approved plan (Build Plan mode). |
+| `ops-review` | findings report in chat | What is the implemented change **missing**? Silent operational failures: absent timeouts, unbounded resources, connection leaks, degradation under slow dependencies. |
 
 Each stage is gated: a skill refuses to run ahead of its inputs (`BLOCKED`), refuses
 to grow the scope (`SCOPE_OVERDESIGN`), and never silently invokes the next stage.
@@ -64,8 +65,8 @@ Install the groundwork skills from https://github.com/tony-adamson/groundwork:
    as the update source, do not delete it after install.
 2. Run ./install.sh with the flags for my harnesses:
    --claude for Claude Code, --codex for Codex CLI, --pi for Pi, --all for everything.
-3. Verify: the skills codebase-analysis, solution-design and planf3 appear in
-   the harness skills directory (e.g. ls ~/.claude/skills).
+3. Verify: the skills codebase-analysis, solution-design, planf3 and ops-review
+   appear in the harness skills directory (e.g. ls ~/.claude/skills).
 To update later: git pull in the clone, then re-run ./install.sh.
 ```
 
@@ -81,8 +82,8 @@ canonical text, so overrides cannot silently rot.
 
 ## Usage
 
-In Claude Code: `/codebase-analysis`, `/solution-design`, `/planf3`.
-In Codex CLI: `$codebase-analysis`, `$solution-design`, `$planf3`.
+In Claude Code: `/codebase-analysis`, `/solution-design`, `/planf3`, `/ops-review`.
+In Codex CLI: `$codebase-analysis`, `$solution-design`, `$planf3`, `$ops-review`.
 
 Intended flow for architecture-sized tasks:
 
@@ -90,10 +91,13 @@ Intended flow for architecture-sized tasks:
 codebase-analysis  →  CURRENT_STATE.md   (approve)
 solution-design    →  SOLUTION.md        (approve)
 planf3             →  implementation plan (approve, then Build Plan)
+ops-review         →  silent-failure findings (exit gate when the diff touches I/O)
 ```
 
 For small tasks, skip straight to `planf3` or just implement — the skills are
-deliberately gated to explicit invocation and refuse casual use.
+deliberately gated to explicit invocation and refuse casual use. `ops-review`
+stands alone: run it after any implementation whose diff touches I/O (network,
+database, files, subprocesses, queues), whatever produced that diff.
 
 ## Origins
 

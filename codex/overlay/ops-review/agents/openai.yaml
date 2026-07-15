@@ -1,0 +1,6 @@
+interface:
+  display_name: "Ops Review"
+  short_description: "Hunt silent operational failures in a change"
+  default_prompt: "Use $ops-review to review the implemented change for silent operational failures: missing timeouts, unbounded resources, connection leaks, degradation under slow dependencies."
+policy:
+  allow_implicit_invocation: false
