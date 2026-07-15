@@ -55,6 +55,8 @@ The implementer receives a specific phase, allowed files, forbidden changes, val
 
 The verifier works read-only and checks only the correctness/scope/minimality of the current phase.
 
+Model tiers, when the harness supports a per-subagent model: an implementer on a simple, low-risk phase may run on a fast/cheap tier — its output is verified anyway; phases touching auth, payments, migrations, or public contracts, and every verifier, stay on the top tier. Generation may be delegated down; acceptance may not. The tier-to-model mapping is harness configuration, not part of this skill.
+
 ## 4. Repair loops
 
 Do not run an endless fix/test loop.

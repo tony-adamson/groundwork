@@ -10,6 +10,10 @@ The main agent is the coordinator. It writes the final `CURRENT_STATE.md` and is
 
 Do not launch subagents for the sake of process. No nested spawning.
 
+## Model tiers
+
+All roles here are read-only fact-gathering, so if the harness supports per-subagent model selection, a fast/cheap tier is sufficient for every subagent: they return facts with evidence, and the coordinator re-verifies material statements before using them. The coordinator itself stays on the top tier — it authors the document and owns the quality of the evidence. The tier-to-model mapping is harness configuration, not part of this skill; without per-agent model support, run everything on the session model.
+
 ## How to assign tasks
 
 Give each subagent a narrow read-only area:

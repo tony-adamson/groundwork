@@ -11,6 +11,15 @@ The coordinator is the sole author of `SOLUTION.md`.
 
 No nested spawning. Do not delegate for the sake of process.
 
+## Model tiers
+
+If the harness supports per-subagent model selection, route by role:
+
+- **Fact-gathering roles** (Context Explorer, Domain/Docs Researcher) — a fast/cheap tier is sufficient: they return facts with evidence, and the coordinator re-verifies material claims anyway.
+- **Judgment roles** (Design Challenger, Lean Challenger, the coordinator itself) — the top tier. Generation and recon may be delegated down; judgment and acceptance may not.
+
+The tier-to-model mapping is harness configuration (agent definitions, rules files), not part of this skill. If the harness cannot set a per-agent model, run every role on the session model. If the cheap tier returns unusable results for a class of tasks twice in a row, move that class up a tier and record it in the harness rules.
+
 ## Roles
 
 ### Context Explorer
