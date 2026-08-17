@@ -5,11 +5,12 @@
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILLS=(codebase-analysis solution-design planf3 ops-review)
+SKILLS=(codebase-analysis solution-design planf3 ops-review scope-review)
+WORKFLOWS=(verify.workflow.js)
 
 usage() {
   echo "usage: $0 [--claude] [--codex] [--pi] [--all]"
-  echo "  --claude  sync canonical skills into ~/.claude/skills"
+  echo "  --claude  sync canonical skills into ~/.claude/skills and workflows into ~/.claude/workflows"
   echo "  --codex   rebuild and sync Codex variant into ~/.codex/skills"
   echo "  --pi      sync canonical skills into ~/.pi/agent/skills"
   echo "  --all     all of the above"
@@ -40,6 +41,12 @@ done
 
 if $do_claude; then
   sync_tree "$REPO/skills" "$HOME/.claude/skills"
+  # Workflows are copied file by file: ~/.claude/workflows may hold the user's own scripts.
+  mkdir -p "$HOME/.claude/workflows"
+  for w in "${WORKFLOWS[@]}"; do
+    cp "$REPO/claude/workflows/$w" "$HOME/.claude/workflows/$w"
+    echo "copied: $w -> $HOME/.claude/workflows/$w"
+  done
 fi
 if $do_codex; then
   python3 "$REPO/tools/build_codex.py"

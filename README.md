@@ -13,6 +13,7 @@ The core pipeline is three skills, each producing one reviewable Markdown artifa
 | `solution-design` | `SOLUTION.md` | What to change, why this way, which contracts must survive, what is out of scope. |
 | `planf3` | `specs/<name>-implementation-plan.md` | The smallest executable plan; also executes an approved plan (Build Plan mode). |
 | `ops-review` | findings report in chat | What is the implemented change **missing**? Silent operational failures: absent timeouts, unbounded resources, connection leaks, degradation under slow dependencies. |
+| `scope-review` | findings report in chat | What in the diff **should not exist**? Excess scope: additions without a forcing requirement, foreign patterns, indirection layers, duplication, files outside the task frame. Instructions currently in Russian (translation pending). |
 
 Each stage is gated: a skill refuses to run ahead of its inputs (`BLOCKED`), refuses
 to grow the scope (`SCOPE_OVERDESIGN`), and never silently invokes the next stage.
@@ -65,7 +66,7 @@ Install the groundwork skills from https://github.com/tony-adamson/groundwork:
    as the update source, do not delete it after install.
 2. Run ./install.sh with the flags for my harnesses:
    --claude for Claude Code, --codex for Codex CLI, --pi for Pi, --all for everything.
-3. Verify: the skills codebase-analysis, solution-design, planf3 and ops-review
+3. Verify: the skills codebase-analysis, solution-design, planf3, ops-review and scope-review
    appear in the harness skills directory (e.g. ls ~/.claude/skills).
 To update later: git pull in the clone, then re-run ./install.sh.
 ```
@@ -82,8 +83,8 @@ canonical text, so overrides cannot silently rot.
 
 ## Usage
 
-In Claude Code: `/codebase-analysis`, `/solution-design`, `/planf3`, `/ops-review`.
-In Codex CLI: `$codebase-analysis`, `$solution-design`, `$planf3`, `$ops-review`.
+In Claude Code: `/codebase-analysis`, `/solution-design`, `/planf3`, `/ops-review`, `/scope-review`, `/verify`.
+In Codex CLI: `$codebase-analysis`, `$solution-design`, `$planf3`, `$ops-review`, `$scope-review`.
 
 Intended flow for architecture-sized tasks:
 
@@ -92,12 +93,35 @@ codebase-analysis  →  CURRENT_STATE.md   (approve)
 solution-design    →  SOLUTION.md        (approve)
 planf3             →  implementation plan (approve, then Build Plan)
 ops-review         →  silent-failure findings (exit gate when the diff touches I/O)
+scope-review       →  excess-scope findings (exit gate before the PR)
+verify (workflow)  →  diff → ops-review + scope-review + assumption check → one structured report
 ```
 
 For small tasks, skip straight to `planf3` or just implement — the skills are
 deliberately gated to explicit invocation and refuse casual use. `ops-review`
 stands alone: run it after any implementation whose diff touches I/O (network,
 database, files, subprocesses, queues), whatever produced that diff.
+
+### Rule set and workflow (Claude Code)
+
+The skills assume the working rules in `claude/CLAUDE.md`: task triage
+S/M/L, a scope contract before M/L work (goal, files, checks, assumptions,
+non-goals), the ×2 stop rule on diff size, minimal sufficient change, the
+trust pyramid and model-tier routing. Without that base the skills still
+run, but their gates have nothing to bind to — merge the file into your
+`~/.claude/CLAUDE.md` (it is not installed automatically; the text is in
+Russian).
+
+`claude/workflows/verify.workflow.js` is a [dynamic workflow](https://code.claude.com/docs/en/workflows)
+that runs the exit gates as one command, `/verify [range]`: collects the
+diff, runs `ops-review` (only when the diff touches I/O), `scope-review`
+and an assumption check in parallel, then synthesizes a single structured
+report — verdict, findings with `file:line` evidence, "what to check in
+review", and a `CONFIRMED`/`UNVERIFIED` status per assumption. Pass the
+scope-contract assumptions as `args.assumptions` and the estimate as
+`args.estimate` so the stop rule is computed in code, not by an agent.
+Read-only, no artifact files. Requires Claude Code ≥ 2.1.154 with dynamic
+workflows enabled in `/config`.
 
 ## Origins
 

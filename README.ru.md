@@ -14,6 +14,7 @@ Evidence-first процессные навыки для coding-агентов: �
 | `solution-design` | `SOLUTION.md` | Что менять, почему именно так, какие контракты должны сохраниться, что вне scope. |
 | `planf3` | `specs/<name>-implementation-plan.md` | Самый маленький исполняемый план; также исполняет утверждённый план (режим Build Plan). |
 | `ops-review` | отчёт с findings в чате | Чего в реализованном изменении **нет**? Тихие операционные отказы: отсутствующие таймауты, неограниченные ресурсы, утечки соединений, деградация при замедлившихся зависимостях. |
+| `scope-review` | отчёт с findings в чате | Чего в diff **быть не должно**? Избыточный scope: добавления без вынуждающего требования, чужеродные паттерны, прослойки, дублирование, файлы вне рамки задачи. |
 
 Каждая стадия закрыта воротами: навык отказывается бежать вперёд своих входов
 (`BLOCKED`), отказывается раздувать scope (`SCOPE_OVERDESIGN`) и никогда молча
@@ -36,6 +37,8 @@ future-proofing, без новых абстракций без второго р
 
 ```
 skills/            канонические версии (формат Claude Code / Pi) — редактировать здесь
+claude/CLAUDE.md   глобальные правила, на которые опираются навыки (триаж S/M/L, scope-контракт, стоп-правило, пирамида доверия) — мержить в ~/.claude/CLAUDE.md руками
+claude/workflows/  dynamic workflows Claude Code (verify.workflow.js) — install.sh копирует в ~/.claude/workflows
 codex/skills/      генерируемый вариант для Codex CLI — руками не править
 codex/overlay/     codex-only файлы (agents/openai.yaml), подмешиваются при сборке
 tools/build_codex.py   пересобирает codex/skills/ из skills/
@@ -71,7 +74,7 @@ Install the groundwork skills from https://github.com/tony-adamson/groundwork:
    as the update source, do not delete it after install.
 2. Run ./install.sh with the flags for my harnesses:
    --claude for Claude Code, --codex for Codex CLI, --pi for Pi, --all for everything.
-3. Verify: the skills codebase-analysis, solution-design, planf3 and ops-review
+3. Verify: the skills codebase-analysis, solution-design, planf3, ops-review and scope-review
    appear in the harness skills directory (e.g. ls ~/.claude/skills).
 To update later: git pull in the clone, then re-run ./install.sh.
 ```
@@ -88,8 +91,8 @@ To update later: git pull in the clone, then re-run ./install.sh.
 
 ## Использование
 
-В Claude Code: `/codebase-analysis`, `/solution-design`, `/planf3`, `/ops-review`.
-В Codex CLI: `$codebase-analysis`, `$solution-design`, `$planf3`, `$ops-review`.
+В Claude Code: `/codebase-analysis`, `/solution-design`, `/planf3`, `/ops-review`, `/scope-review`, `/verify`.
+В Codex CLI: `$codebase-analysis`, `$solution-design`, `$planf3`, `$ops-review`, `$scope-review`.
 
 Задуманный поток для задач архитектурного масштаба:
 
@@ -98,12 +101,33 @@ codebase-analysis  →  CURRENT_STATE.md   (утвердить)
 solution-design    →  SOLUTION.md        (утвердить)
 planf3             →  implementation plan (утвердить, затем Build Plan)
 ops-review         →  findings о тихих отказах (выходные ворота, если diff трогает I/O)
+scope-review       →  findings об избыточном scope (выходные ворота перед PR)
+verify (workflow)  →  diff → ops-review + scope-review + проверка допущений → один структурный отчёт
 ```
 
 Для маленьких задач иди сразу в `planf3` или просто реализуй — навыки намеренно
 закрыты на явный вызов и отказываются от случайного использования. `ops-review`
 самостоятелен: запускай его после любой реализации, чей diff трогает I/O (сеть,
 БД, файлы, subprocess, очереди), независимо от того, что этот diff произвело.
+
+### Свод правил и workflow (Claude Code)
+
+Навыки опираются на рабочие правила из `claude/CLAUDE.md`: триаж задач S/M/L,
+scope-контракт перед M/L (цель, файлы, проверки, допущения, non-goals),
+стоп-правило ×2 по размеру diff, minimal sufficient change, пирамида доверия и
+tier-роутинг моделей. Без этого базиса навыки работают, но их воротам не к чему
+привязаться — смержи файл в свой `~/.claude/CLAUDE.md` (автоматически не
+устанавливается).
+
+`claude/workflows/verify.workflow.js` — [dynamic workflow](https://code.claude.com/docs/en/workflows),
+который прогоняет выходные ворота одной командой `/verify [range]`: собирает
+diff, параллельно запускает `ops-review` (только если diff трогает I/O),
+`scope-review` и проверку допущений, затем сводит один структурный отчёт —
+вердикт, находки с evidence `file:line`, «что проверить на ревью» и статус
+`CONFIRMED`/`UNVERIFIED` по каждому допущению. Допущения scope-контракта
+передавай в `args.assumptions`, оценку — в `args.estimate`: стоп-правило
+считается кодом, а не агентом. Read-only, файлов-артефактов не создаёт. Нужен
+Claude Code ≥ 2.1.154 с включёнными dynamic workflows в `/config`.
 
 ## Происхождение
 
