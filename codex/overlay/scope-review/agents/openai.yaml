@@ -1,0 +1,6 @@
+interface:
+  display_name: "Scope Review"
+  short_description: "Find excess scope in a diff before PR"
+  default_prompt: "Use $scope-review to check the current diff for additions without a forcing requirement, foreign patterns, indirection layers, duplication and files outside the task frame."
+policy:
+  allow_implicit_invocation: false
