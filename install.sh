@@ -5,7 +5,7 @@
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILLS=(codebase-analysis solution-design planf3 ops-review scope-review)
+SKILLS=(codebase-analysis solution-design planf3 ops-review scope-review debug)
 WORKFLOWS=(verify.workflow.js)
 
 usage() {

@@ -14,6 +14,7 @@ The core pipeline is three skills, each producing one reviewable Markdown artifa
 | `planf3` | `specs/<name>-implementation-plan.md` | The smallest executable plan; also executes an approved plan (Build Plan mode). |
 | `ops-review` | findings report in chat | What is the implemented change **missing**? Silent operational failures: absent timeouts, unbounded resources, connection leaks, degradation under slow dependencies. |
 | `scope-review` | findings report in chat | What in the diff **should not exist**? Excess scope: additions without a forcing requirement, foreign patterns, indirection layers, duplication, files outside the task frame. Instructions currently in Russian (translation pending). |
+| `debug` | root cause + regression test, report in chat | Why does it **still** fail? Build a loop that goes red on the bug, minimise, rank falsifiable hypotheses, instrument, fix at a correct seam, clean up. |
 
 Each stage is gated: a skill refuses to run ahead of its inputs (`BLOCKED`), refuses
 to grow the scope (`SCOPE_OVERDESIGN`), and never silently invokes the next stage.

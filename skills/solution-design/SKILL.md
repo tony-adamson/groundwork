@@ -72,6 +72,15 @@ If the correct solution looks overbuilt, the status must be `BLOCKED_BY_SCOPE_OV
 - a future work parking lot;
 - a justification for every new dependency/subsystem/persistent state/abstraction, if any are needed.
 
+## Interview rounds
+
+Open questions to the user are asked as a **design tree** worked in rounds (after `grilling`, mattpocock/skills):
+
+- The **frontier** is every question whose prerequisites are already settled. Ask the whole frontier in one round; a question that depends on another still open one belongs to a later round.
+- Every question carries a stable code (`Q1`, `Q2`, …) and **your recommended answer** with the reason; the user may reply `Q1 ок, Q2: <answer>`.
+- Facts are yours to find (code, docs, tools, a sub-agent) — never ask the user for something you can look up. Decisions are the user's — put each to them and wait.
+- The interview is done when the frontier is empty: nothing left silently assumed. Anything still open at that point goes into `SOLUTION.md` as an explicit assumption with how it will be verified, not as a decision.
+
 ## Delegation
 
 Use subagents only when they add value:
