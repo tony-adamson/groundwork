@@ -67,7 +67,7 @@ Install the groundwork skills from https://github.com/tony-adamson/groundwork:
    as the update source, do not delete it after install.
 2. Run ./install.sh with the flags for my harnesses:
    --claude for Claude Code, --codex for Codex CLI, --pi for Pi, --all for everything.
-3. Verify: the skills codebase-analysis, solution-design, planf3, ops-review and scope-review
+3. Verify: the skills codebase-analysis, solution-design, planf3, ops-review, scope-review and debug
    appear in the harness skills directory (e.g. ls ~/.claude/skills).
 To update later: git pull in the clone, then re-run ./install.sh.
 ```
@@ -84,8 +84,8 @@ canonical text, so overrides cannot silently rot.
 
 ## Usage
 
-In Claude Code: `/codebase-analysis`, `/solution-design`, `/planf3`, `/ops-review`, `/scope-review`, `/verify`.
-In Codex CLI: `$codebase-analysis`, `$solution-design`, `$planf3`, `$ops-review`, `$scope-review`.
+In Claude Code: `/codebase-analysis`, `/solution-design`, `/planf3`, `/ops-review`, `/scope-review`, `/debug`, `/verify`.
+In Codex CLI: `$codebase-analysis`, `$solution-design`, `$planf3`, `$ops-review`, `$scope-review`, `$debug`.
 
 Intended flow for architecture-sized tasks:
 
@@ -96,12 +96,16 @@ planf3             →  implementation plan (approve, then Build Plan)
 ops-review         →  silent-failure findings (exit gate when the diff touches I/O)
 scope-review       →  excess-scope findings (exit gate before the PR)
 verify (workflow)  →  diff → ops-review + scope-review + assumption check → one structured report
+debug              →  root cause + regression test (standalone: when a bug survives the first fix)
 ```
 
 For small tasks, skip straight to `planf3` or just implement — the skills are
 deliberately gated to explicit invocation and refuse casual use. `ops-review`
 stands alone: run it after any implementation whose diff touches I/O (network,
 database, files, subprocesses, queues), whatever produced that diff.
+`debug` also stands alone: it starts where "read the stack trace and fix"
+failed — the same error came back, the failure is intermittent, or the
+symptom is "slow". Its gate: no hypothesis before a red-capable loop exists.
 
 ### Rule set and workflow (Claude Code)
 

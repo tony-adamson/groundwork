@@ -1,0 +1,6 @@
+interface:
+  display_name: "Debug"
+  short_description: "Root-cause a bug through a red-capable feedback loop"
+  default_prompt: "Use $debug to diagnose this bug: build a loop that goes red on it, minimise, rank hypotheses, instrument, fix with a regression test."
+policy:
+  allow_implicit_invocation: false

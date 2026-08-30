@@ -75,7 +75,7 @@ Install the groundwork skills from https://github.com/tony-adamson/groundwork:
    as the update source, do not delete it after install.
 2. Run ./install.sh with the flags for my harnesses:
    --claude for Claude Code, --codex for Codex CLI, --pi for Pi, --all for everything.
-3. Verify: the skills codebase-analysis, solution-design, planf3, ops-review and scope-review
+3. Verify: the skills codebase-analysis, solution-design, planf3, ops-review, scope-review and debug
    appear in the harness skills directory (e.g. ls ~/.claude/skills).
 To update later: git pull in the clone, then re-run ./install.sh.
 ```
@@ -92,8 +92,8 @@ To update later: git pull in the clone, then re-run ./install.sh.
 
 ## Использование
 
-В Claude Code: `/codebase-analysis`, `/solution-design`, `/planf3`, `/ops-review`, `/scope-review`, `/verify`.
-В Codex CLI: `$codebase-analysis`, `$solution-design`, `$planf3`, `$ops-review`, `$scope-review`.
+В Claude Code: `/codebase-analysis`, `/solution-design`, `/planf3`, `/ops-review`, `/scope-review`, `/debug`, `/verify`.
+В Codex CLI: `$codebase-analysis`, `$solution-design`, `$planf3`, `$ops-review`, `$scope-review`, `$debug`.
 
 Задуманный поток для задач архитектурного масштаба:
 
@@ -104,12 +104,16 @@ planf3             →  implementation plan (утвердить, затем Buil
 ops-review         →  findings о тихих отказах (выходные ворота, если diff трогает I/O)
 scope-review       →  findings об избыточном scope (выходные ворота перед PR)
 verify (workflow)  →  diff → ops-review + scope-review + проверка допущений → один структурный отчёт
+debug              →  root cause + регрессионный тест (отдельно: когда баг пережил первую правку)
 ```
 
 Для маленьких задач иди сразу в `planf3` или просто реализуй — навыки намеренно
 закрыты на явный вызов и отказываются от случайного использования. `ops-review`
 самостоятелен: запускай его после любой реализации, чей diff трогает I/O (сеть,
 БД, файлы, subprocess, очереди), независимо от того, что этот diff произвело.
+`debug` тоже самостоятелен: он начинается там, где «прочитать stack trace и
+починить» не сработало — та же ошибка вернулась, падение плавающее или симптом
+«медленно». Его гейт: никаких гипотез, пока нет петли, которая краснеет на баге.
 
 ### Свод правил и workflow (Claude Code)
 
