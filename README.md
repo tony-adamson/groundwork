@@ -117,6 +117,12 @@ run, but their gates have nothing to bind to — merge the file into your
 `~/.claude/CLAUDE.md` (it is not installed automatically; the text is in
 Russian).
 
+`agents/AGENTS.md` is a harness-agnostic subset of the same rules (task
+triage, scope contract, stop rule, minimal sufficient change, contracts,
+trust pyramid) for agents that read `AGENTS.md` instead — Codex, Pi, omp;
+Claude-Code-only sections (model-tier routing, the skills/artifacts
+pipeline, slash-command references) are dropped or reworded generically.
+
 `claude/workflows/verify.workflow.js` is a [dynamic workflow](https://code.claude.com/docs/en/workflows)
 that runs the exit gates as one command, `/verify [range]`: collects the
 diff, runs `ops-review` (only when the diff touches I/O), `scope-review`
