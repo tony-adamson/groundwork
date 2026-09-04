@@ -11,9 +11,10 @@ export const meta = {
 
 // ── args ─────────────────────────────────────────────────────────────────
 // Строка: трактуется как git range/ref (пусто = рабочее дерево против merge-base).
-// Объект: { cwd?, range?, assumptions?: [{id, text}] | string[], estimate?: { files, loc } }
+// Объект: { cwd?, range?, assumptions?: [{id, text}] | string[], estimate?: { files, loc }, scope?: string }
 //   assumptions — допущения из scope-контракта, передаёт главная сессия (workflow их не выводит).
 //   estimate    — оценка из scope-контракта для стоп-правила ×2 (считается в JS, не агентом).
+//   scope       — текст scope-контракта (цель, не входит): без него scope-review сверяется с чем попало в репо.
 let A = args
 if (typeof A === 'string') {
   const s = A.trim()
@@ -25,7 +26,11 @@ const CWD = A.cwd || '.'
 const RANGE = A.range || ''
 const ASSUMPTIONS = (A.assumptions || []).map((a, i) =>
   (typeof a === 'string') ? { id: `A${i + 1}`, text: a } : { id: a.id || `A${i + 1}`, text: a.text || String(a) })
-const ESTIMATE = A.estimate || null
+// Оценка приводится к первому числу в значении: строка вида "~5 файлов" давала NaN, и стоп-правило молча не срабатывало.
+const toCount = v => { const m = String(v ?? '').match(/\d+(\.\d+)?/); const n = m ? Number(m[0]) : NaN; return Number.isFinite(n) && n > 0 ? n : null }
+const ESTIMATE = A.estimate ? { files: toCount(A.estimate.files), loc: toCount(A.estimate.loc) } : null
+if (ESTIMATE && !ESTIMATE.files && !ESTIMATE.loc) throw new Error(`verify: args.estimate без числовых files/loc: ${JSON.stringify(A.estimate)}`)
+const SCOPE = typeof A.scope === 'string' ? A.scope.trim() : ''
 
 // Роутинг моделей: sonnet — сбор/синтез, opus — линзы-верификаторы. Без явного model агент берёт модель сессии.
 const SKILLS = '~/.claude/skills'
@@ -103,8 +108,11 @@ if (!diff || !diff.hasChanges || !(diff.files && diff.files.length)) {
 }
 
 // Стоп-правило ×2 — плоский JS, без агента.
-const filesChanged = diff.files.length
-const locNet = diff.files.reduce((s, f) => s + (f.added || 0) - (f.removed || 0), 0)
+// Lock/generated-файлы не считаются: Cargo.lock на 1285 строк — не превышение scope.
+const GENERATED = /(^|\/)(Cargo\.lock|package-lock\.json|yarn\.lock|pnpm-lock\.yaml|poetry\.lock|uv\.lock|Podfile\.lock|go\.sum|composer\.lock|Gemfile\.lock)$/
+const counted = diff.files.filter(f => !GENERATED.test(f.path || ''))
+const filesChanged = counted.length
+const locNet = counted.reduce((s, f) => s + (f.added || 0) - (f.removed || 0), 0)
 let stopRule = null
 if (ESTIMATE && (ESTIMATE.files || ESTIMATE.loc)) {
   const overFiles = ESTIMATE.files ? filesChanged > 2 * ESTIMATE.files : false
@@ -136,6 +144,7 @@ if (diff.touchesIO) {
 lensTasks.push(() => agent(
   `${ctx}
 Ты выполняешь навык scope-review. Прочитай через Bash (cat) ${SKILLS}/scope-review/SKILL.md целиком и файлы в ${SKILLS}/scope-review/references/ (если есть) — это твой чек-лист и правила severity, следуй им дословно.
+${SCOPE ? 'Scope-контракт задачи — единственный источник требований; документы в репозитории (issues, specs, старые планы) ему уступают:\n' + SCOPE : 'Scope-контракт не передан (args.scope): требование могло быть озвучено в чате — находку «нет вынуждающего требования» ставить не выше WARN.'}
 Ищи класс «чего в diff быть не должно»: добавления без вынуждающего требования, чужеродные паттерны, прослойки, дублирование существующих helpers, негигиеничный diff. Каждая находка обязана называть нарушенное правило из SKILL.md. ${READ_ONLY}
 Верни lens="scope-review", findings, coverage.`,
   { label: 'lens:scope-review', phase: 'Lenses', schema: LENS_SCHEMA, model: 'opus' }))

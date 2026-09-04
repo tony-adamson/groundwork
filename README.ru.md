@@ -39,7 +39,7 @@ future-proofing, без новых абстракций без второго р
 ```
 skills/            канонические версии (формат Claude Code / Pi) — редактировать здесь
 claude/CLAUDE.md   глобальные правила, на которые опираются навыки (триаж S/M/L, scope-контракт, стоп-правило, пирамида доверия) — мержить в ~/.claude/CLAUDE.md руками
-claude/workflows/  dynamic workflows Claude Code (verify.workflow.js) — install.sh копирует в ~/.claude/workflows
+claude/workflows/  dynamic workflows Claude Code (verify.workflow.js, build-plan.workflow.js) — install.sh копирует в ~/.claude/workflows
 codex/skills/      генерируемый вариант для Codex CLI — руками не править
 codex/overlay/     codex-only файлы (agents/openai.yaml), подмешиваются при сборке
 tools/build_codex.py   пересобирает codex/skills/ из skills/
@@ -133,6 +133,11 @@ diff, параллельно запускает `ops-review` (только ес�
 передавай в `args.assumptions`, оценку — в `args.estimate`: стоп-правило
 считается кодом, а не агентом. Read-only, файлов-артефактов не создаёт. Нужен
 Claude Code ≥ 2.1.154 с включёнными dynamic workflows в `/config`.
+
+`claude/workflows/build-plan.workflow.js` реализует утверждённый план `planf3`
+фазами вне главного контекста — implement, verify, fix, gate — и возвращает
+структурную сводку; вызывается командой `/build-plan`, когда план дошёл до
+`READY_FOR_BUILD`.
 
 ## Происхождение
 

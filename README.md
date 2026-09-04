@@ -128,6 +128,11 @@ scope-contract assumptions as `args.assumptions` and the estimate as
 Read-only, no artifact files. Requires Claude Code ≥ 2.1.154 with dynamic
 workflows enabled in `/config`.
 
+`claude/workflows/build-plan.workflow.js` runs an approved `planf3` plan phase
+by phase outside the main context — implement, verify, fix, gate — and
+returns a structured summary; use it via `/build-plan` once a plan is
+`READY_FOR_BUILD`.
+
 ## Origins
 
 The `planf3` skill is not an original work: it is an adapted and reworked
