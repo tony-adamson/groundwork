@@ -56,10 +56,11 @@ install.sh         зеркалит навыки в локальные харн�
 ```bash
 git clone https://github.com/tony-adamson/groundwork
 cd groundwork
-./install.sh --all          # Claude Code + Codex + Pi
+./install.sh --all          # Claude Code + Codex + Pi + oh-my-pi
 ./install.sh --claude       # только ~/.claude/skills
 ./install.sh --codex        # пересобрать Codex-вариант, синк в ~/.codex/skills
 ./install.sh --pi           # только ~/.pi/agent/skills
+./install.sh --omp          # ~/.omp/agent/skills + agents/AGENTS.md -> ~/.omp/agent/AGENTS.md
 ```
 
 Синхронизация использует `rsync --delete`: локальные копии — зеркала и не должны

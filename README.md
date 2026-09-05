@@ -48,10 +48,11 @@ Claude-only frontmatter keys dropped, and a couple of harness-specific lines
 ```bash
 git clone https://github.com/tony-adamson/groundwork
 cd groundwork
-./install.sh --all          # Claude Code + Codex + Pi
+./install.sh --all          # Claude Code + Codex + Pi + oh-my-pi
 ./install.sh --claude       # only ~/.claude/skills
 ./install.sh --codex        # rebuild Codex variant, sync to ~/.codex/skills
 ./install.sh --pi           # only ~/.pi/agent/skills
+./install.sh --omp          # ~/.omp/agent/skills + agents/AGENTS.md -> ~/.omp/agent/AGENTS.md
 ```
 
 Syncing uses `rsync --delete`: the local copies are mirrors and must not hold
@@ -66,7 +67,7 @@ Install the groundwork skills from https://github.com/tony-adamson/groundwork:
 1. Clone the repo to a permanent location (e.g. ~/tools/groundwork) — it stays
    as the update source, do not delete it after install.
 2. Run ./install.sh with the flags for my harnesses:
-   --claude for Claude Code, --codex for Codex CLI, --pi for Pi, --all for everything.
+   --claude for Claude Code, --codex for Codex CLI, --pi for Pi, --omp for oh-my-pi, --all for everything.
 3. Verify: the skills codebase-analysis, solution-design, planf3, ops-review, scope-review and debug
    appear in the harness skills directory (e.g. ls ~/.claude/skills).
 To update later: git pull in the clone, then re-run ./install.sh.

@@ -6,13 +6,14 @@ set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS=(codebase-analysis solution-design planf3 ops-review scope-review debug)
-WORKFLOWS=(verify.workflow.js)
+WORKFLOWS=(verify.workflow.js build-plan.workflow.js)
 
 usage() {
-  echo "usage: $0 [--claude] [--codex] [--pi] [--all]"
+  echo "usage: $0 [--claude] [--codex] [--pi] [--omp] [--all]"
   echo "  --claude  sync canonical skills into ~/.claude/skills and workflows into ~/.claude/workflows"
   echo "  --codex   rebuild and sync Codex variant into ~/.codex/skills"
   echo "  --pi      sync canonical skills into ~/.pi/agent/skills"
+  echo "  --omp     sync canonical skills into ~/.omp/agent/skills and agents/AGENTS.md into ~/.omp/agent/AGENTS.md"
   echo "  --all     all of the above"
   exit 1
 }
@@ -28,13 +29,14 @@ sync_tree() {
 
 [ $# -gt 0 ] || usage
 
-do_claude=false do_codex=false do_pi=false
+do_claude=false do_codex=false do_pi=false do_omp=false
 for arg in "$@"; do
   case "$arg" in
     --claude) do_claude=true ;;
     --codex) do_codex=true ;;
     --pi) do_pi=true ;;
-    --all) do_claude=true do_codex=true do_pi=true ;;
+    --omp) do_omp=true ;;
+    --all) do_claude=true do_codex=true do_pi=true do_omp=true ;;
     *) usage ;;
   esac
 done
@@ -54,4 +56,11 @@ if $do_codex; then
 fi
 if $do_pi; then
   sync_tree "$REPO/skills" "$HOME/.pi/agent/skills"
+fi
+if $do_omp; then
+  # oh-my-pi keeps its own agent dir (~/.omp/agent) and does not read ~/.pi/agent.
+  sync_tree "$REPO/skills" "$HOME/.omp/agent/skills"
+  mkdir -p "$HOME/.omp/agent"
+  cp "$REPO/agents/AGENTS.md" "$HOME/.omp/agent/AGENTS.md"
+  echo "copied: agents/AGENTS.md -> $HOME/.omp/agent/AGENTS.md"
 fi
