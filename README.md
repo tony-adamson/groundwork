@@ -51,12 +51,14 @@ cd groundwork
 ./install.sh --all          # Claude Code + Codex + Pi + oh-my-pi
 ./install.sh --claude       # only ~/.claude/skills
 ./install.sh --codex        # rebuild Codex variant, sync to ~/.codex/skills
-./install.sh --pi           # ~/.pi/agent/skills + agents/AGENTS.md -> ~/.pi/agent/AGENTS.md
+./install.sh --pi           # ~/.pi/agent/skills + agents/AGENTS.md -> ~/.pi/agent/AGENTS.md + pi/prompts -> ~/.pi/agent/prompts
 ./install.sh --omp          # ~/.omp/agent/skills + agents/AGENTS.md -> ~/.omp/agent/AGENTS.md
 ```
 
 Syncing uses `rsync --delete`: the local copies are mirrors and must not hold
-unique content. To update later: `git pull && ./install.sh --all`.
+unique content. The one exception is `~/.pi/agent/prompts`: Pi reads it non-recursively,
+so `pi/prompts` is merged in without `--delete` and your own templates survive.
+To update later: `git pull && ./install.sh --all`.
 
 ### Agent install
 

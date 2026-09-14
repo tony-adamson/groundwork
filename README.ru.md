@@ -59,12 +59,14 @@ cd groundwork
 ./install.sh --all          # Claude Code + Codex + Pi + oh-my-pi
 ./install.sh --claude       # только ~/.claude/skills
 ./install.sh --codex        # пересобрать Codex-вариант, синк в ~/.codex/skills
-./install.sh --pi           # ~/.pi/agent/skills + agents/AGENTS.md -> ~/.pi/agent/AGENTS.md
+./install.sh --pi           # ~/.pi/agent/skills + agents/AGENTS.md -> ~/.pi/agent/AGENTS.md + pi/prompts -> ~/.pi/agent/prompts
 ./install.sh --omp          # ~/.omp/agent/skills + agents/AGENTS.md -> ~/.omp/agent/AGENTS.md
 ```
 
 Синхронизация использует `rsync --delete`: локальные копии — зеркала и не должны
-содержать уникального контента. Обновление: `git pull && ./install.sh --all`.
+содержать уникального контента. Исключение — `~/.pi/agent/prompts`: Pi читает его без
+вложенных папок, поэтому `pi/prompts` доливается без `--delete`, свои шаблоны остаются.
+Обновление: `git pull && ./install.sh --all`.
 
 ### Установка через агента
 

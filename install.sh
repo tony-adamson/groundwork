@@ -12,7 +12,7 @@ usage() {
   echo "usage: $0 [--claude] [--codex] [--pi] [--omp] [--all]"
   echo "  --claude  sync canonical skills into ~/.claude/skills and workflows into ~/.claude/workflows"
   echo "  --codex   rebuild and sync Codex variant into ~/.codex/skills"
-  echo "  --pi      sync canonical skills into ~/.pi/agent/skills and agents/AGENTS.md into ~/.pi/agent/AGENTS.md"
+  echo "  --pi      sync canonical skills into ~/.pi/agent/skills, agents/AGENTS.md into ~/.pi/agent/AGENTS.md, pi/prompts into ~/.pi/agent/prompts"
   echo "  --omp     sync canonical skills into ~/.omp/agent/skills and agents/AGENTS.md into ~/.omp/agent/AGENTS.md"
   echo "  --all     all of the above"
   exit 1
@@ -59,6 +59,11 @@ if $do_pi; then
   mkdir -p "$HOME/.pi/agent"
   cp "$REPO/agents/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"
   echo "copied: agents/AGENTS.md -> $HOME/.pi/agent/AGENTS.md"
+  # Pi reads ~/.pi/agent/prompts non-recursively, so the user's own templates live
+  # next to ours: merge without --delete, unlike the skill mirrors above.
+  mkdir -p "$HOME/.pi/agent/prompts"
+  rsync -a --exclude .DS_Store "$REPO/pi/prompts/" "$HOME/.pi/agent/prompts/"
+  echo "synced: pi/prompts -> $HOME/.pi/agent/prompts"
 fi
 if $do_omp; then
   # oh-my-pi keeps its own agent dir (~/.omp/agent) and does not read ~/.pi/agent.
