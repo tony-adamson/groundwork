@@ -51,7 +51,7 @@ cd groundwork
 ./install.sh --all          # Claude Code + Codex + Pi + oh-my-pi
 ./install.sh --claude       # only ~/.claude/skills
 ./install.sh --codex        # rebuild Codex variant, sync to ~/.codex/skills
-./install.sh --pi           # only ~/.pi/agent/skills
+./install.sh --pi           # ~/.pi/agent/skills + agents/AGENTS.md -> ~/.pi/agent/AGENTS.md
 ./install.sh --omp          # ~/.omp/agent/skills + agents/AGENTS.md -> ~/.omp/agent/AGENTS.md
 ```
 

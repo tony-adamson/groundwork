@@ -59,7 +59,7 @@ cd groundwork
 ./install.sh --all          # Claude Code + Codex + Pi + oh-my-pi
 ./install.sh --claude       # только ~/.claude/skills
 ./install.sh --codex        # пересобрать Codex-вариант, синк в ~/.codex/skills
-./install.sh --pi           # только ~/.pi/agent/skills
+./install.sh --pi           # ~/.pi/agent/skills + agents/AGENTS.md -> ~/.pi/agent/AGENTS.md
 ./install.sh --omp          # ~/.omp/agent/skills + agents/AGENTS.md -> ~/.omp/agent/AGENTS.md
 ```
 

@@ -123,6 +123,17 @@ Every new file must have a reason. If it can be done locally without a new layer
 
 Below the table, state the total estimate: `Estimated LOC net: ~N`. It is used by the 2× stop rule during Build Plan.
 
+Below the estimate, list the runtime the phases and validation commands depend on:
+
+```
+Runtime preconditions:
+- docker daemon on this machine — check: `docker info >/dev/null`
+- <db / external API / queue> — check: `<command that exits 0 when available>`
+- new service on a guarded host: the harness deploy guard answers `ask`, not `deny`, for the deploy step — check: `<command that runs the guard against the deploy command and exits 0 on ask>`
+```
+
+One line per dependency, each with a check command that terminates and exits 0 when the dependency is available (a `grep` over a file is not a check: it cannot go red). Build Plan runs all of them before Build and stops if any is unmet (2026-09-10: a phase gate needed a live docker daemon that was never started, and the run finished with the fact buried in findings). `Runtime preconditions: none` is a valid answer.
+
 ## 8. Phases
 
 Phases must be sequential, small, and verifiable.

@@ -12,7 +12,7 @@ usage() {
   echo "usage: $0 [--claude] [--codex] [--pi] [--omp] [--all]"
   echo "  --claude  sync canonical skills into ~/.claude/skills and workflows into ~/.claude/workflows"
   echo "  --codex   rebuild and sync Codex variant into ~/.codex/skills"
-  echo "  --pi      sync canonical skills into ~/.pi/agent/skills"
+  echo "  --pi      sync canonical skills into ~/.pi/agent/skills and agents/AGENTS.md into ~/.pi/agent/AGENTS.md"
   echo "  --omp     sync canonical skills into ~/.omp/agent/skills and agents/AGENTS.md into ~/.omp/agent/AGENTS.md"
   echo "  --all     all of the above"
   exit 1
@@ -56,6 +56,9 @@ if $do_codex; then
 fi
 if $do_pi; then
   sync_tree "$REPO/skills" "$HOME/.pi/agent/skills"
+  mkdir -p "$HOME/.pi/agent"
+  cp "$REPO/agents/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"
+  echo "copied: agents/AGENTS.md -> $HOME/.pi/agent/AGENTS.md"
 fi
 if $do_omp; then
   # oh-my-pi keeps its own agent dir (~/.omp/agent) and does not read ~/.pi/agent.

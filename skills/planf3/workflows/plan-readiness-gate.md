@@ -36,6 +36,7 @@ Check that the plan:
 - does not implement future work;
 - does not refactor unrelated code;
 - has a files-to-change budget and an `Estimated LOC net`;
+- has a `Runtime preconditions` block (or `none`), each entry with a check command;
 - does not build a platform for a local task;
 - includes the rejected overengineering.
 
