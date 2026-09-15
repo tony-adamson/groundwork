@@ -40,6 +40,7 @@ For each I/O inventory row, trace to evidence in code or config:
 - **Boundedness**: what limits the result-set size, queue length, cache growth, accepted body size.
 - **Repeat**: retry policy and backoff; whether the operation is idempotent under retry.
 - **Degradation**: the behavior when a dependency is slow-but-alive — the worst incident class, because nothing errors while every worker blocks.
+- **Deploy artifacts**: a script invoked directly (ssh `command=`, cron, systemd `ExecStart`, a hook) carries the executable bit in git (`git ls-tree` shows `100755`); every command in a runbook or deploy doc runs as written (flags, stdin, user) — a wrong login or copy step is a silent first-deploy failure, not a doc typo.
 
 Full checklists per category: [silent-failure-taxonomy.md](references/silent-failure-taxonomy.md).
 
