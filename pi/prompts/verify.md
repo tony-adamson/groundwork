@@ -31,5 +31,5 @@ Print, in this order: diff stat and frame; lenses (scope-review, ops-review) wit
 
 Then print the verdict as the very last line of the answer, nothing after it:
 
-- `VERDICT: PASS warn=<n> unverified=<m>` — no BLOCKING findings and x2 rule not triggered; `n` = WARN findings, `m` = UNVERIFIED assumptions, so a caller can still see that PASS was not clean.
-- `VERDICT: FAIL reason=<blocking|scope-x2|no-changes|missing-skill> <one short clause>` — otherwise.
+- `VERDICT: PASS unverified=<m>` — no BLOCKING and no WARN findings, x2 rule not triggered; `m` = UNVERIFIED assumptions, they stay in the report and do not fail the verdict.
+- `VERDICT: FAIL reason=<blocking|warn|scope-x2|no-changes|missing-skill> <one short clause>` — otherwise. WARN findings fail the verdict too: they are fixed in the same phase, never carried into the next one. Only INFO may be left as is.
