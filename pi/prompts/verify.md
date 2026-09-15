@@ -6,7 +6,9 @@ READ-ONLY verification of the current change. Do not edit files, do not run test
 
 Input (free text, may be empty): $@
 
-Parse the input for: a git range/ref; a list of assumptions (`A1 …`); an estimate (`N files, M loc`); scope text (goal and non-goals). Missing parts are simply skipped, never invented.
+Parse the input for: a git range/ref; a list of assumptions (`A1 …`); an estimate (`N files, M loc`); scope text (goal and non-goals); an `accepted:` block — findings from earlier verification rounds and decisions the owner made while the phase was blocked. Missing parts are simply skipped, never invented.
+
+Accepted items are requirements: a change that implements one of them is in scope for scope-review even when the plan text does not mention it, and ops-review does not raise it again. Lenses must not contradict each other across rounds: if ops-review demanded a safeguard in a previous round, scope-review does not reject it in this one.
 
 ## Step 1 — Diff
 - Frame: the given range, or the working tree against `git merge-base HEAD <default branch>`. If `merge-base` fails (no remote, shallow clone, detached HEAD), use `HEAD` and say so in the report; never read a failed command as "no changes".
