@@ -151,6 +151,8 @@ For each phase:
 
 Do not parallelize dependent phases.
 
+A phase that adds a network, deploy or CI step names the timeout and the retry limit of every external call in its tasks (ssh, image pull, compose up, HTTP, job `timeout-minutes`). Missing limits are a plan defect, not something the build may add on its own: ops-review will demand them and scope-review will reject them as unplanned (2026-09-15: three failed verify rounds on a deploy phase for exactly this).
+
 ## 9. Plan Challenger
 
 Launch a fresh read-only Plan Challenger. It hunts for correctness gaps:
