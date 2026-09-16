@@ -19,6 +19,7 @@ Accepted items are requirements: a change that implements one of them is in scop
 ## Step 2 — Lenses
 - Read `~/.pi/agent/skills/scope-review/SKILL.md` and apply it to the diff exactly as written there, using the scope text from the input as the requirement. Collect its findings with severity BLOCKING / WARN / INFO.
 - If the diff touches I/O: read `~/.pi/agent/skills/ops-review/SKILL.md` and apply it the same way. Otherwise write "ops-review: skipped, no I/O in diff".
+- Ops findings never outrank the plan. A finding whose fix would add code the plan or scope text does not ask for (a timeout adapter, streaming, retries, a session object, an extra pre-check) is not a WARN: report it as `PLAN-GAP` (INFO severity) with the one-line change the plan would need, so the owner decides. It is a WARN only when the plan or contract requires it, or when the added code itself is defective (a leak, lost data, a security hole, a wrong default) and the fix edits that code rather than adding a subsystem. Before asserting an omission, cite the fact: "missing timeout" must show the call has none, and a library default counts as one.
 - If a SKILL.md file is missing, do not improvise the lens: report the missing path and finish with `VERDICT: FAIL reason=missing-skill <path>`.
 - Deduplicate findings that point at the same `file:line`.
 
