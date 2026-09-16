@@ -147,7 +147,10 @@ For each phase:
 - tasks;
 - phase validation;
 - verifier focus;
-- exit criteria.
+- exit criteria;
+- `Estimated LOC net: ~N` (files and net lines) — the phase's own counterpart of the whole-plan estimate in section 7.
+
+A phase estimated above ~400 LOC net is split at planning time, never left for review to catch. Copy the phase's estimate to its tracker card as an `estimate:` header so Build Plan's verifier can apply the 2× stop rule.
 
 Do not parallelize dependent phases.
 
