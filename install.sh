@@ -45,10 +45,21 @@ if $do_claude; then
   sync_tree "$REPO/skills" "$HOME/.claude/skills"
   # Workflows are copied file by file: ~/.claude/workflows may hold the user's own scripts.
   mkdir -p "$HOME/.claude/workflows"
+  skipped=0
   for w in "${WORKFLOWS[@]}"; do
-    cp "$REPO/claude/workflows/$w" "$HOME/.claude/workflows/$w"
-    echo "copied: $w -> $HOME/.claude/workflows/$w"
+    dst="$HOME/.claude/workflows/$w"
+    # The mirror is overwritten from the canon, so an edit made only in ~/.claude dies here without a
+    # trace: build-plan.workflow.js lost its Precheck phase and the x2 stop rule this way on 2026-09-20.
+    if [ -f "$dst" ] && ! cmp -s "$REPO/claude/workflows/$w" "$dst" && [ "$dst" -nt "$REPO/claude/workflows/$w" ]; then
+      echo "SKIPPED: $dst is newer than the canon and differs from it" >&2
+      skipped=$((skipped+1)); continue
+    fi
+    cp "$REPO/claude/workflows/$w" "$dst"
+    echo "copied: $w -> $dst"
   done
+  if [ "$skipped" -gt 0 ]; then
+    echo "ACTION NEEDED: $skipped workflow(s) left untouched. Copy each into $REPO/claude/workflows/, commit it, then re-run." >&2
+  fi
 fi
 if $do_codex; then
   python3 "$REPO/tools/build_codex.py"
