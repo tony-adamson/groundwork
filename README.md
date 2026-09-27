@@ -48,12 +48,15 @@ Claude-only frontmatter keys dropped, and a couple of harness-specific lines
 ```bash
 git clone https://github.com/tony-adamson/groundwork
 cd groundwork
-./install.sh --all          # Claude Code + Codex + Pi + oh-my-pi
+./install.sh --all          # Claude Code + Codex + Pi + oh-my-pi + Grok
 ./install.sh --claude       # only ~/.claude/skills
 ./install.sh --codex        # rebuild Codex variant, sync to ~/.codex/skills
 ./install.sh --pi           # ~/.pi/agent/skills + agents/AGENTS.md -> ~/.pi/agent/AGENTS.md + pi/prompts -> ~/.pi/agent/prompts
 ./install.sh --omp          # ~/.omp/agent/skills + agents/AGENTS.md -> ~/.omp/agent/AGENTS.md
+./install.sh --grok         # ~/.grok/skills (Grok rules in ~/.grok/rules are adapted by hand)
 ```
+
+Cursor needs no flag: it loads `~/.claude/skills` and `~/.codex/skills` itself.
 
 Syncing uses `rsync --delete`: the local copies are mirrors and must not hold
 unique content. The one exception is `~/.pi/agent/prompts`: Pi reads it non-recursively,

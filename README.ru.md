@@ -56,12 +56,15 @@ install.sh         зеркалит навыки в локальные харн�
 ```bash
 git clone https://github.com/tony-adamson/groundwork
 cd groundwork
-./install.sh --all          # Claude Code + Codex + Pi + oh-my-pi
+./install.sh --all          # Claude Code + Codex + Pi + oh-my-pi + Grok
 ./install.sh --claude       # только ~/.claude/skills
 ./install.sh --codex        # пересобрать Codex-вариант, синк в ~/.codex/skills
 ./install.sh --pi           # ~/.pi/agent/skills + agents/AGENTS.md -> ~/.pi/agent/AGENTS.md + pi/prompts -> ~/.pi/agent/prompts
 ./install.sh --omp          # ~/.omp/agent/skills + agents/AGENTS.md -> ~/.omp/agent/AGENTS.md
+./install.sh --grok         # ~/.grok/skills (правила Grok в ~/.grok/rules адаптируются вручную)
 ```
+
+Cursor отдельного флага не требует: он сам читает `~/.claude/skills` и `~/.codex/skills`.
 
 Синхронизация использует `rsync --delete`: локальные копии — зеркала и не должны
 содержать уникального контента. Исключение — `~/.pi/agent/prompts`: Pi читает его без
