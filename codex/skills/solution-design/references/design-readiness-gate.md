@@ -60,7 +60,7 @@ Every framework/platform capability has evidence, official docs, a spike, a fall
 - every unknown is blocking or non-blocking;
 - every non-blocking assumption has a validation method.
 
-Run `python3 <skills directory>/planf3/scripts/check-citations.py SOLUTION.md` from the repository root. `FAIL` on a non-zero exit: a `file:line` citation names a file that does not exist or a line past its end. Fix the citation from the live code; do not delete it to make the check pass.
+Run `python3 <skills directory>/planf3/scripts/check-citations.py SOLUTION.md` from the repository root. `FAIL` on a non-zero exit: a `file:line` citation names a file that does not exist or a line past its end. Fix the citation from the live code; do not delete it to make the check pass. A reported citation of code outside this checkout (a server, another repository) passes only when the document names where that code lives next to it; the script cannot open it.
 
 ## 8. PlanF3 handoff closure
 
