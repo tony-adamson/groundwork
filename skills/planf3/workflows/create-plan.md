@@ -152,6 +152,8 @@ For each phase:
 
 A phase estimated above ~400 LOC net is split at planning time, never left for review to catch. Copy the phase's estimate to its tracker card as an `estimate:` header so Build Plan's verifier can apply the 2× stop rule.
 
+Every phase that changes files also carries one line `**Команда проверки**: `<command>`` — a single shell command, run from the worktree root with relative paths, that exits 0 only when the phase's behavior is in place. The runner executes it itself after the builder reports done and returns a red result to the builder before any model reviews the change (SOL-185: the builder reported green after weakening its own checks). The command runs the phase's tests or acceptance script; it is not a `grep` and not a text comparison with the change itself. Run-only phases may omit it.
+
 Do not parallelize dependent phases.
 
 A phase that adds a network, deploy or CI step names the timeout and the retry limit of every external call in its tasks (ssh, image pull, compose up, HTTP, job `timeout-minutes`). Missing limits are a plan defect, not something the build may add on its own: ops-review will demand them and scope-review will reject them as unplanned (2026-09-15: three failed verify rounds on a deploy phase for exactly this).
