@@ -53,7 +53,7 @@ Use adaptively:
 
 The implementer receives a specific phase, allowed files, forbidden changes, validation commands, and the expected result.
 
-The verifier works read-only and checks only the correctness/scope/minimality of the current phase.
+The verifier works read-only and checks only the correctness/scope/minimality of the current phase. On Grok the verifier is a fresh read-only `spawn_subagent`; the phase is not `[x]` until that child has returned, and two failed attempts on the same problem end the phase as `[f]`. Do not review the phase inline and report it as a verifier.
 
 Model tiers, when the harness supports a per-subagent model: an implementer on a simple, low-risk phase may run on a fast/cheap tier — its output is verified anyway; phases touching auth, payments, migrations, or public contracts, and every verifier, stay on the top tier. Generation may be delegated down; acceptance may not. The tier-to-model mapping is harness configuration, not part of this skill.
 
@@ -85,8 +85,8 @@ Stop if:
 2. Match every material requirement to implementation evidence and a pass condition.
 3. Check the tracked/untracked diff.
 4. Make sure the excluded areas did not change.
-5. Run a final read-only review: `/code-review` in Claude Code, ponytail in Pi; if unavailable — a separate inline pass that outputs only findings.
-6. If the diff looks bloated — shrink it: `/simplify` in Claude Code; otherwise a separate reuse/simplification pass that applies the fixes.
+5. Run a final read-only review: `/code-review` in Claude Code, ponytail in Pi, `/verify` on Grok (it spawns scope-review, ops-review when the diff touches I/O, and code-review); if unavailable — a separate inline pass that outputs only findings. An inline reread is not a substitute for a reviewer the harness has.
+6. If the diff looks bloated — shrink it: `/simplify` in Claude Code; elsewhere (no `/simplify` there — do not invent one) a separate reuse/simplification pass that applies the fixes.
 
 ## 7. Final report
 

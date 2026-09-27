@@ -160,7 +160,7 @@ A phase that adds a network, deploy or CI step names the timeout and the retry l
 
 ## 9. Plan Challenger
 
-Launch a fresh read-only Plan Challenger. It hunts for correctness gaps:
+Launch a fresh read-only Plan Challenger. On Grok this is a `spawn_subagent` call in the same step as the Lean Challenger, not an inline reread. It hunts for correctness gaps:
 
 - missing requirements;
 - changes to `SOLUTION.md` contracts;
@@ -169,11 +169,13 @@ Launch a fresh read-only Plan Challenger. It hunts for correctness gaps:
 - missing auth/safety/failure behavior;
 - non-reproducible validation;
 - incorrect commands;
-- invalid fallback mechanisms.
+- invalid fallback mechanisms;
+- negative platform claims. Do not trust the author's search. Open the file that declares the symbol. An empty search is not evidence of absence;
+- a validation whose expected result is derived from text the same change will write.
 
 ## 10. Lean Plan Challenger
 
-Launch a fresh read-only Lean Challenger. It hunts for overengineering:
+Launch a fresh read-only Lean Challenger (on Grok with `spawn_subagent`). It hunts for overengineering:
 
 - unnecessary files;
 - unnecessary dependencies;
@@ -187,6 +189,8 @@ Launch a fresh read-only Lean Challenger. It hunts for overengineering:
 ## 11. Correction
 
 Fix the accepted findings. Reject unsupported findings with a reason. If a new design decision is discovered — `BLOCKED_FOR_SOLUTION_AMENDMENT`.
+
+If any accepted finding was `BLOCKING`, run that challenger once more against the corrected plan. A `BLOCKING` finding on the second pass means the plan does not become `READY_FOR_BUILD`.
 
 ## 12. Readiness
 

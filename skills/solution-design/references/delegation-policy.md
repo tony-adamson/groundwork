@@ -41,6 +41,7 @@ Fresh read-only context. Hunts for correctness gaps:
 - auth/security gaps;
 - missing validation;
 - decisions deferred to PlanF3.
+- negative platform claims. Do not trust the author's search. Open the file that declares the symbol. An empty search is not evidence of absence.
 
 ### Lean Challenger
 

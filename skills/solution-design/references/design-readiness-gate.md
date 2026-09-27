@@ -49,6 +49,8 @@ For the read/write/action surfaces, the actor, owner, boundary, unauthenticated/
 
 Every framework/platform capability has evidence, official docs, a spike, a fallback, or a blocking unknown.
 
+`FAIL` if the document states that a platform capability is absent or impossible without a `file:line` citation of the artifact that declares it, or without a command output that fails when the claim is wrong. An empty search of a CLI package, a wrapper, or model memory is not that citation. Such a claim cannot be a non-blocking assumption.
+
 ## 7. Traceability closure
 
 - every requirement has a design response;

@@ -123,6 +123,17 @@ Every new file must have a reason. If it can be done locally without a new layer
 
 Below the table, state the total estimate: `Estimated LOC net: ~N`. It is used by the 2× stop rule during Build Plan.
 
+Below the estimate, list the runtime the phases and validation commands depend on:
+
+```
+Runtime preconditions:
+- docker daemon on this machine — check: `docker info >/dev/null`
+- <db / external API / queue> — check: `<command that exits 0 when available>`
+- new service on a guarded host: the harness deploy guard answers `ask`, not `deny`, for the deploy step — check: `<command that runs the guard against the deploy command and exits 0 on ask>`
+```
+
+One line per dependency, each with a check command that terminates and exits 0 when the dependency is available (a `grep` over a file is not a check: it cannot go red). Build Plan runs all of them before Build and stops if any is unmet (2026-09-10: a phase gate needed a live docker daemon that was never started, and the run finished with the fact buried in findings). `Runtime preconditions: none` is a valid answer.
+
 ## 8. Phases
 
 Phases must be sequential, small, and verifiable.
@@ -136,13 +147,20 @@ For each phase:
 - tasks;
 - phase validation;
 - verifier focus;
-- exit criteria.
+- exit criteria;
+- `Estimated LOC net: ~N` (files and net lines) — the phase's own counterpart of the whole-plan estimate in section 7.
+
+A phase estimated above ~400 LOC net is split at planning time, never left for review to catch. Copy the phase's estimate to its tracker card as an `estimate:` header so Build Plan's verifier can apply the 2× stop rule.
+
+Every phase that changes files also carries one line `**Команда проверки**: `<command>`` — a single shell command, run from the worktree root with relative paths, that exits 0 only when the phase's behavior is in place. The runner executes it itself after the builder reports done and returns a red result to the builder before any model reviews the change (SOL-185: the builder reported green after weakening its own checks). The command runs the phase's tests or acceptance script; it is not a `grep` and not a text comparison with the change itself. Run-only phases may omit it.
 
 Do not parallelize dependent phases.
 
+A phase that adds a network, deploy or CI step names the timeout and the retry limit of every external call in its tasks (ssh, image pull, compose up, HTTP, job `timeout-minutes`). Missing limits are a plan defect, not something the build may add on its own: ops-review will demand them and scope-review will reject them as unplanned (2026-09-15: three failed verify rounds on a deploy phase for exactly this).
+
 ## 9. Plan Challenger
 
-Launch a fresh read-only Plan Challenger. It hunts for correctness gaps:
+Launch a fresh read-only Plan Challenger. On Grok this is a `spawn_subagent` call in the same step as the Lean Challenger, not an inline reread. It hunts for correctness gaps:
 
 - missing requirements;
 - changes to `SOLUTION.md` contracts;
@@ -151,11 +169,13 @@ Launch a fresh read-only Plan Challenger. It hunts for correctness gaps:
 - missing auth/safety/failure behavior;
 - non-reproducible validation;
 - incorrect commands;
-- invalid fallback mechanisms.
+- invalid fallback mechanisms;
+- negative platform claims. Do not trust the author's search. Open the file that declares the symbol. An empty search is not evidence of absence;
+- a validation whose expected result is derived from text the same change will write.
 
 ## 10. Lean Plan Challenger
 
-Launch a fresh read-only Lean Challenger. It hunts for overengineering:
+Launch a fresh read-only Lean Challenger (on Grok with `spawn_subagent`). It hunts for overengineering:
 
 - unnecessary files;
 - unnecessary dependencies;
@@ -169,6 +189,8 @@ Launch a fresh read-only Lean Challenger. It hunts for overengineering:
 ## 11. Correction
 
 Fix the accepted findings. Reject unsupported findings with a reason. If a new design decision is discovered — `BLOCKED_FOR_SOLUTION_AMENDMENT`.
+
+If any accepted finding was `BLOCKING`, run that challenger once more against the corrected plan. A `BLOCKING` finding on the second pass means the plan does not become `READY_FOR_BUILD`.
 
 ## 12. Readiness
 

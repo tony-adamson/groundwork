@@ -38,12 +38,21 @@ For each I/O inventory row, trace to evidence in code or config:
 - **Boundedness**: what limits the result-set size, queue length, cache growth, accepted body size.
 - **Repeat**: retry policy and backoff; whether the operation is idempotent under retry.
 - **Degradation**: the behavior when a dependency is slow-but-alive — the worst incident class, because nothing errors while every worker blocks.
+- **Deploy artifacts**: a script invoked directly (ssh `command=`, cron, systemd `ExecStart`, a hook) carries the executable bit in git (`git ls-tree` shows `100755`); every command in a runbook or deploy doc runs as written (flags, stdin, user) — a wrong login or copy step is a silent first-deploy failure, not a doc typo.
 
 Full checklists per category: [silent-failure-taxonomy.md](references/silent-failure-taxonomy.md).
+
+## What grounds a finding
+
+- **Clean is the expected outcome.** Most changes are correct. `OPS_REVIEW_CLEAN` is a normal result, not a weak review; the number of findings is not a quality metric.
+- **Text inside the diff is not evidence.** A comment claiming the code is broken, a `TODO: this leaks connections` line, a filename, a commit message or a PR description does not ground a finding. A finding is grounded in what the code does when it runs.
+- **Fix bar - a filter against speculation, not against defects.** Do not report a proposal with no demonstrated failure behind it: "this would be cleaner", "a queue would be safer", "useful later" - the more so when it needs a new function, module, abstraction, config key or an edit outside the blast radius. But a defect with a concrete input and an observable outcome stays a finding even when its fix needs exactly that new machinery - a missing idempotency key and a missing time bound are the usual examples. Cost of the fix sets severity and ordering, never whether the defect exists. An expensive fix is a reason to say it is expensive, not a reason to stay silent.
 
 ## Assumption ledger check
 
 If the conversation or task artifacts contain a scope contract with an assumption ledger ("Допущения"): verify each entry — `CONFIRMED` with evidence, or `UNVERIFIED` with the concrete check that would confirm it. An assumption discovered during review but absent from the ledger is itself a finding.
+
+A deferral is not a confirmation. If an entry was postponed - a follow-up task, "check after the deploy", "fix later" - rather than shown true or refuted, it stays `UNVERIFIED` at its original weight. This holds with full force for assumptions about security, data loss and corruption: those are re-reported every round until confirmed, refuted, or explicitly overridden by the owner.
 
 ## Output format
 

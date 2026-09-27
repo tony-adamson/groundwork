@@ -41,9 +41,9 @@ SKILL_REF = re.compile(r"`(graphify|codebase-analysis|solution-design|planf3|ops
 # Keyed by path relative to skills/. Applied after the $-prefix pass.
 LINE_OVERRIDES = {
     "planf3/workflows/build-plan.md": {
-        "5. Run a final read-only review: `/code-review` in Claude Code, ponytail in Pi; if unavailable — a separate inline pass that outputs only findings.":
+        "5. Run a final read-only review: `/code-review` in Claude Code, ponytail in Pi, `/verify` on Grok (it spawns scope-review, ops-review when the diff touches I/O, and code-review); if unavailable — a separate inline pass that outputs only findings. An inline reread is not a substitute for a reviewer the harness has.":
         "5. Run a final fresh read-only code review; if a separate reviewer is unavailable — do a separate inline pass that outputs only findings.",
-        "6. If the diff looks bloated — shrink it: `/simplify` in Claude Code; otherwise a separate reuse/simplification pass that applies the fixes.":
+        "6. If the diff looks bloated — shrink it: `/simplify` in Claude Code; elsewhere (no `/simplify` there — do not invent one) a separate reuse/simplification pass that applies the fixes.":
         "6. If the diff looks bloated — run a simplify/reuse pass and apply only fixes that reduce scope without losing requirements.",
     },
 }

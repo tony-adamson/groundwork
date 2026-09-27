@@ -49,3 +49,4 @@ Every decision must have:
 - subagent consensus as evidence;
 - unjustified new architecture;
 - leaving PlanF3 to choose public behavior.
+- a negative platform claim ("this does not exist", "this cannot be done") whose only support is an empty search of the wrong tree, a wrapper, or model memory.

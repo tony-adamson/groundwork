@@ -96,7 +96,11 @@ For a non-trivial solution, these are mandatory:
 
 Both work read-only. Only the coordinator writes the final `SOLUTION.md`.
 
+On Grok the two challengers are real `spawn_subagent` calls, launched together, before the status moves; a challenger that was not spawned must not be reported as run. Each prompt contains the role text from `references/delegation-policy.md`, the absolute path of this `SKILL.md`, the draft `SOLUTION.md` path, and the rule that the child returns findings only. Do not pass `model` unless the user named one of `grok-4.5`, `grok-4.6`, `grok-4.7`, `grok-4.7-build-fast`.
+
 If the harness does not provide an isolated-subagent tool (for example, Pi) — run the challengers inline: two separate passes, each outputting only findings in the delegation-policy format, then the coordinator responds. Do not simulate spawning subagents and do not claim they were launched.
+
+The coordinator applies accepted findings. If an accepted finding was `BLOCKING`, run that challenger once more against the corrected draft. A `BLOCKING` finding on the second pass stops the skill with `BLOCKED`.
 
 ## What to read
 

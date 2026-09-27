@@ -36,6 +36,7 @@ Check that the plan:
 - does not implement future work;
 - does not refactor unrelated code;
 - has a files-to-change budget and an `Estimated LOC net`;
+- has a `Runtime preconditions` block (or `none`), each entry with a check command;
 - does not build a platform for a local task;
 - includes the rejected overengineering.
 
@@ -76,6 +77,10 @@ Every behavioral validation has:
 - an expected exit status.
 
 A long-running interactive command is not an acceptance command.
+
+`FAIL` if a behavioral pass condition only checks text produced by the same change (a SQL string, a function body, an `ORDER BY` the author wrote). The expectation has to name an observable outcome on separately stated inputs, such as expected ids. A column-name `LIMIT 0` and a repeated page may stay, and they do not replace that outcome check.
+
+`FAIL` if the plan states that a platform capability is absent or impossible without a `file:line` citation of the declaring artifact or a command output that fails when the claim is wrong. An empty search is not that citation.
 
 ## 7. Command sanity gate
 

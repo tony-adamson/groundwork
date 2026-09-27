@@ -78,6 +78,10 @@ Every behavioral validation has:
 
 A long-running interactive command is not an acceptance command.
 
+`FAIL` if a behavioral pass condition only checks text produced by the same change (a SQL string, a function body, an `ORDER BY` the author wrote). The expectation has to name an observable outcome on separately stated inputs, such as expected ids. A column-name `LIMIT 0` and a repeated page may stay, and they do not replace that outcome check.
+
+`FAIL` if the plan states that a platform capability is absent or impossible without a `file:line` citation of the declaring artifact or a command output that fails when the claim is wrong. An empty search is not that citation.
+
 ## 7. Command sanity gate
 
 Check the commands:
