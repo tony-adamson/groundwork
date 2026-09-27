@@ -133,7 +133,9 @@ and an assumption check in parallel, then synthesizes a single structured
 report — verdict, findings with `file:line` evidence, "what to check in
 review", and a `CONFIRMED`/`UNVERIFIED` status per assumption. Pass the
 scope-contract assumptions as `args.assumptions` and the estimate as
-`args.estimate` so the stop rule is computed in code, not by an agent.
+`args.estimate` so the stop rule is computed in code, not by an agent;
+the finding merge (one finding per `file:line`, highest severity, stable
+`V1…` ids) and the verdict are computed in code too.
 Read-only, no artifact files. Requires Claude Code ≥ 2.1.154 with dynamic
 workflows enabled in `/config`.
 

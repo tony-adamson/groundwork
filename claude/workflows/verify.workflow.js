@@ -6,7 +6,7 @@ export const meta = {
     { title: 'Diff', detail: 'git diff --stat + содержательные хунки диапазона; признак I/O' },
     { title: 'Lenses', detail: 'parallel: ops-review (если I/O), scope-review, assumption-check — по SKILL.md из ~/.claude/skills' },
     { title: 'Falsify', detail: 'opus: попытка убить каждую находку линз; выживает только перевыведенная по коду' },
-    { title: 'Synthesize', detail: 'дедуп, severity, «что проверить на ревью», статусы допущений' },
+    { title: 'Synthesize', detail: 'дедуп и вердикт в JS; агент — «что проверить на ревью» и summary' },
   ],
 }
 
@@ -122,13 +122,8 @@ const FALSIFY_SCHEMA = {
   },
 }
 const SYNTH_SCHEMA = {
-  type: 'object', additionalProperties: false, required: ['verdict', 'findings', 'reviewChecks', 'summary'],
+  type: 'object', additionalProperties: false, required: ['reviewChecks', 'summary'],
   properties: {
-    verdict: { type: 'string', enum: ['OK', 'REVIEW_REQUIRED', 'BLOCKED'] },
-    findings: { type: 'array', items: { type: 'object', additionalProperties: false,
-      required: ['file', 'line', 'severity', 'issue', 'lenses'],
-      properties: { file: { type: 'string' }, line: { type: 'string' }, severity: { type: 'string', enum: ['BLOCKING', 'WARN', 'INFO'] },
-        issue: { type: 'string' }, evidence: { type: 'string' }, lenses: { type: 'array', items: { type: 'string' } } } } },
     reviewChecks: { type: 'array', minItems: 1, maxItems: 5, items: { type: 'object', additionalProperties: false,
       required: ['risk', 'howToCheck'], properties: { risk: { type: 'string' }, howToCheck: { type: 'string' } } },
       description: '«Что проверить на ревью»: 3–5 конкретных рисков и как проверить руками' },
@@ -246,29 +241,55 @@ ${JSON.stringify(rawFindings)}
 const verifiedFindings = falsify ? falsify.survived : rawFindings
 
 // ── Phase 4: Synthesize ─────────────────────────────────────────────────
+// Дедуп, порядок, номера и вердикт — плоский JS, как стоп-правило: агент синтеза сливал одну находку
+// по-разному от прогона к прогону, и один и тот же набор давал разные вердикты.
+// Ключ — файл и первое число строки: две линзы об одном месте — одна находка, severity максимальный.
+const SEV = { BLOCKING: 0, WARN: 1, INFO: 2 }
+const mergeFindings = (list) => {
+  const byKey = new Map()
+  for (const f of list) {
+    const line = (String(f.line ?? '').match(/\d+/) || [String(f.line ?? '')])[0]
+    const evidence = f.evidence || [f.callPath, f.outcome].filter(Boolean).join(' → ')
+    const severity = evidence && f.severity in SEV ? f.severity : 'INFO'   // без доказательства — только INFO
+    const key = `${f.file}:${line}`
+    const cur = byKey.get(key)
+    if (!cur) { byKey.set(key, { file: f.file, line, severity, issue: f.issue || '', evidence, lenses: f.lens ? [f.lens] : [] }); continue }
+    if (SEV[severity] < SEV[cur.severity]) cur.severity = severity
+    if (f.issue && !cur.issue.includes(f.issue)) cur.issue += ' | ' + f.issue
+    if (!cur.evidence) cur.evidence = evidence
+    if (f.lens && !cur.lenses.includes(f.lens)) cur.lenses.push(f.lens)
+  }
+  return [...byKey.values()]
+    .sort((a, b) => SEV[a.severity] - SEV[b.severity] || String(a.file).localeCompare(String(b.file)) || (Number(a.line) || 0) - (Number(b.line) || 0))
+    .map((f, i) => ({ id: `V${i + 1}`, ...f }))
+}
+const findings = mergeFindings(verifiedFindings)
+const unverifiedCount = assumptionResult ? (assumptionResult.results || []).filter((r) => r.status === 'UNVERIFIED').length : 0
+const verdict = findings.some((f) => f.severity === 'BLOCKING') || (stopRule && stopRule.triggered) ? 'BLOCKED'
+  : findings.some((f) => f.severity === 'WARN') || unverifiedCount ? 'REVIEW_REQUIRED' : 'OK'
+log(`merge: ${verifiedFindings.length} → ${findings.length} находок, verdict=${verdict}`)
+
 phase('Synthesize')
 const synthesis = await agent(
   `Сведи результаты верификации изменения. Репозиторий: ${CWD}, рамка: ${diff.range}.
 git diff --stat:
 ${diff.stat}
-Находки, пережившие проход фальсификации (каждая с перевыведенными input/callPath/outcome): ${JSON.stringify(verifiedFindings)}
+Находки после фальсификации и дедупа (номера V1… стабильны, не менять): ${JSON.stringify(findings)}
+Вердикт (посчитан скриптом, не менять): ${verdict}
 Отбраковано в фальсификации: ${falsify ? falsify.killed.length : 0}${falsify && falsify.killed.length ? ' — ' + JSON.stringify(falsify.killed) : ''}
 Покрытие линз: ${JSON.stringify(lenses.map((l) => ({ lens: l.lens, coverage: l.coverage })))}
 Статусы допущений: ${JSON.stringify(assumptionResult)}
 Стоп-правило: ${JSON.stringify(stopRule)}
 Задача:
-1. Дедуп: одна проблема в одном file:line — объединить, взять максимальный severity, перечислить lenses-источники. Находки без evidence — понизить до INFO.
-2. Отсортировать по severity.
-3. reviewChecks — 3–5 конкретных рисков «что проверить на ревью руками» (по находкам, UNVERIFIED-допущениям и природе diff), каждый с howToCheck (команда/файл/сценарий).
-4. verdict: есть BLOCKING или сработало стоп-правило → BLOCKED; есть WARN или UNVERIFIED-допущения → REVIEW_REQUIRED; иначе OK.
-5. Отбракованные фальсификацией кандидаты НЕ возвращать — ни в findings, ни в reviewChecks.
-6. Пустой список находок — нормальный и ожидаемый исход: большинство изменений корректны, и verdict OK не является признаком плохой верификации.
-7. summary — 3–5 строк по-русски. Код не трогай.`,
+1. reviewChecks — 3–5 конкретных рисков «что проверить на ревью руками» (по находкам со ссылкой на их V-номер, UNVERIFIED-допущениям и природе diff), каждый с howToCheck (команда/файл/сценарий).
+2. Отбракованные фальсификацией кандидаты в reviewChecks НЕ возвращать.
+3. Пустой список находок — нормальный и ожидаемый исход: большинство изменений корректны, и verdict OK не является признаком плохой верификации.
+4. summary — 3–5 строк по-русски. Код не трогай.`,
   { label: 'synthesize', phase: 'Synthesize', schema: SYNTH_SCHEMA, model: 'sonnet' }
 )
 
 return {
-  verdict: (synthesis && synthesis.verdict) || 'UNKNOWN',
+  verdict,
   // Что именно одобрено. Без этого вердикт относится к «текущему дереву», а оно успевает уехать:
   // ещё один фикс, amend, rebase — и одобренный объект уже не тот, что лежит в истории.
   verified: { head: diff.head, dirty: diff.dirty,
@@ -281,7 +302,7 @@ return {
   lensesRun: lenses.map((l) => l.lens),
   falsified: falsify ? { candidates: rawFindings.length, survived: falsify.survived.length, killed: falsify.killed } : null,
   coverage: lenses.map((l) => ({ lens: l.lens, coverage: l.coverage })),
-  findings: (synthesis && synthesis.findings) || [],
+  findings,
   assumptions: assumptionResult ? assumptionResult.results : 'не переданы (args.assumptions)',
   reviewChecks: (synthesis && synthesis.reviewChecks) || [],
   summary: synthesis && synthesis.summary,
