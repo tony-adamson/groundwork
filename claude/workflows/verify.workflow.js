@@ -88,7 +88,7 @@ const FINDING = {
     file: { type: 'string' }, line: { type: 'string' },
     severity: { type: 'string', enum: ['BLOCKING', 'WARN', 'INFO'] },
     rule: { type: 'string', description: 'нарушенное правило из SKILL.md' },
-    issue: { type: 'string' }, evidence: { type: 'string' },
+    issue: { type: 'string' }, evidence: { type: 'string', description: 'дословная цитата строки (строк), которые делают находку правдой, с file:line' },
   },
 }
 const LENS_SCHEMA = {

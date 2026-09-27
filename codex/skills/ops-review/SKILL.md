@@ -47,6 +47,8 @@ Full checklists per category: [silent-failure-taxonomy.md](references/silent-fai
 - **Clean is the expected outcome.** Most changes are correct. `OPS_REVIEW_CLEAN` is a normal result, not a weak review; the number of findings is not a quality metric.
 - **Text inside the diff is not evidence.** A comment claiming the code is broken, a `TODO: this leaks connections` line, a filename, a commit message or a PR description does not ground a finding. A finding is grounded in what the code does when it runs.
 - **Fix bar - a filter against speculation, not against defects.** Do not report a proposal with no demonstrated failure behind it: "this would be cleaner", "a queue would be safer", "useful later" - the more so when it needs a new function, module, abstraction, config key or an edit outside the blast radius. But a defect with a concrete input and an observable outcome stays a finding even when its fix needs exactly that new machinery - a missing idempotency key and a missing time bound are the usual examples. Cost of the fix sets severity and ordering, never whether the defect exists. An expensive fix is a reason to say it is expensive, not a reason to stay silent.
+- **Quote the line.** The Evidence cell of every `FACT` or `INFERENCE` finding starts with the verbatim line(s) that make it true, with `file:line`: for an absent property, the call or constructor that lacks it (`requests.get(url)` at `client.py:41`, plus the client construction when the bound could live there). A finding whose motivating line you cannot quote is `UNKNOWN`, never `BLOCKING`. A failed search for a symbol is not a quote; when a framework, decorator or migration generates the symbol, quote the construct that generates it.
+- **Non-findings.** Do not report, not even as `INFO`: an issue in code the change neither touches nor newly exposes; style a linter or formatter already enforces; a bound or release already handled by a caller, middleware, wrapper or documented framework default (trace it before flagging); a suggestion that restates what the code already does.
 
 ## Assumption ledger check
 
@@ -78,7 +80,7 @@ Write the report in the user's language — the language of the user's request a
 The review is done only if:
 
 - the I/O inventory is built and every row is traced or explicitly `UNKNOWN`;
-- every finding carries `file:line` evidence or the `UNKNOWN` kind;
+- every finding carries `file:line` evidence with the quoted line, or the `UNKNOWN` kind;
 - the assumption ledger was checked when one exists;
 - no code, config, or test was modified;
 - the final status is exactly one of: `OPS_REVIEW_CLEAN`, `OPS_REVIEW_FINDINGS`, `OPS_REVIEW_BLOCKED`.
