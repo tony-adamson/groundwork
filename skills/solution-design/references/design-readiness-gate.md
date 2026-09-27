@@ -60,6 +60,8 @@ Every framework/platform capability has evidence, official docs, a spike, a fall
 - every unknown is blocking or non-blocking;
 - every non-blocking assumption has a validation method.
 
+Run `python3 <skills directory>/planf3/scripts/check-citations.py SOLUTION.md` from the repository root. `FAIL` on a non-zero exit: a `file:line` citation names a file that does not exist or a line past its end. Fix the citation from the live code; do not delete it to make the check pass.
+
 ## 8. PlanF3 handoff closure
 
 The handoff contains fixed contracts, fixed behavior, minimality constraints, exclusions, and no architecture choice for PlanF3.

@@ -12,6 +12,8 @@ Every material requirement/decision from `SOLUTION.md` must have:
 
 A requirement must not exist only in prose.
 
+Run `python3 <this skill's directory>/scripts/check-citations.py <plan path>` from the repository root, and again on `SOLUTION.md` when the plan came from one. `FAIL` on a non-zero exit: a `file:line` citation names a file that does not exist or a line past its end. Fix the citation from the live code; do not delete it to make the check pass.
+
 ## 2. Design boundary gate
 
 The plan must not introduce or choose:
