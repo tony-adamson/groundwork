@@ -96,6 +96,13 @@ For existing/hybrid: only what is relevant to the task; do not copy the entire `
 
 For greenfield: starting constraints, target platforms, available infrastructure, external systems.
 
+### 4.1 Reference conventions [IF: the requirements name a reference system]
+
+| Surface | Reference convention | Evidence (`file:line`) | This design | Deviation reason (requirement ID) |
+|---------|----------------------|------------------------|-------------|-----------------------------------|
+
+Rules that forbid borrowing from the reference: the verbatim source, who said it, the date.
+
 ## 5. Minimality contract
 
 ### 5.1 Smallest acceptable solution
@@ -230,6 +237,24 @@ Do not write just "run tests". State the observable result.
 - Overengineering findings:
 - Removed/simplified items:
 - Accepted complexity with justification:
+
+### Reference Challenger [IF: a reference system is named]
+
+- Unlisted deviations found:
+- Accepted corrections:
+- Rejected findings with reason:
+
+### Schema Challenger [IF: the design adds or changes a persistent schema]
+
+- Columns with no forcing requirement:
+- Facts stored twice:
+- Accepted corrections:
+- Rejected findings with reason:
+
+### Second-vendor Design Challenger [IF: run]
+
+- Model:
+- Findings the first pass did not have:
 
 ## 17. PlanF3 handoff
 

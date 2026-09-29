@@ -1,6 +1,6 @@
 # Design Readiness Gate
 
-Run after the draft, the Design Challenger, and the Lean Challenger.
+Run after the draft and every mandatory challenger.
 
 `READY_FOR_PLANF3` is allowed only after a PASS on all applicable gates.
 
@@ -41,6 +41,8 @@ For every material operation/action/job/command/game action/state-changing flow,
 
 For every new/changed state/cache/storage/relationship/snapshot/derived value, the source of truth, creation/update/delete, owner changes, and rollback/cleanup are defined.
 
+If the design adds or changes a persistent schema: every column names the requirement ID that forces it, and the Schema Challenger ran against the final draft.
+
 ## 5. Access/safety closure
 
 For the read/write/action surfaces, the actor, owner, boundary, unauthenticated/unauthorized behavior, sensitive data, and secret handling are defined.
@@ -65,6 +67,15 @@ Run `python3 <skills directory>/planf3/scripts/check-citations.py SOLUTION.md` f
 ## 8. PlanF3 handoff closure
 
 The handoff contains fixed contracts, fixed behavior, minimality constraints, exclusions, and no architecture choice for PlanF3.
+
+## 9. Reference conformance closure
+
+Applies when the requirements name a reference system.
+
+- the conventions table exists and every row cites `file:line` in the reference;
+- every deviation from a row is a decision with a requirement ID;
+- every rule that forbids borrowing from the reference quotes its source, and no later requirement contradicts that source;
+- the Reference Challenger ran against the final draft.
 
 ## Result
 

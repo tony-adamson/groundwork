@@ -23,9 +23,13 @@ Extract:
 
 Do not turn a model's guess into a user requirement.
 
+If someone other than the requester accepts the work (a lead, a reviewer), record what they asked to see first as `CON-*`. Produce that artifact first, as one page, and wait for their answer before elaborating the rest. If the design adds or changes a persistent schema and they named nothing, the schema is that page. With no such person, this step does not apply.
+
 ## 2. Establish the current context
 
 For existing/hybrid, verify the critical claims against live code, even if `CURRENT_STATE.md` exists.
+
+If the requirements name a reference system, fill the reference conventions table from its code before drafting (`SKILL.md`, "Reference system").
 
 If the baseline is insufficient for a safe solution — `BLOCKED`, and suggest a focused `codebase-analysis`.
 
@@ -68,7 +72,10 @@ Every material requirement must have a verification type and an observable pass 
 For a non-trivial task, launch:
 
 1. the Design Challenger;
-2. the Lean Challenger.
+2. the Lean Challenger;
+3. the Reference Challenger, if a reference system is named;
+4. the Schema Challenger, if the design adds or changes a persistent schema;
+5. the Design Challenger on a second-vendor model, if the harness has one.
 
 Accept only findings with a concrete requirement/contract/failure/cost/evidence.
 

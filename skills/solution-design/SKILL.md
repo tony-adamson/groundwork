@@ -81,6 +81,15 @@ Open questions to the user are asked as a **design tree** worked in rounds (afte
 - Facts are yours to find (code, docs, tools, a sub-agent) — never ask the user for something you can look up. Decisions are the user's — put each to them and wait.
 - The interview is done when the frontier is empty: nothing left silently assumed. Anything still open at that point goes into `SOLUTION.md` as an explicit assumption with how it will be verified, not as a decision.
 
+## Reference system
+
+If the requirements name a reference system ("build it like X"), its conventions are the baseline and the design is a list of deviations from it.
+
+- Before drafting, open the reference's code for every surface the design touches — data schema, naming, units, directory layout, stack, API shape — and record each convention with `file:line`.
+- Every deviation is a `DECISION` whose reason is a requirement ID. "Cleaner" or "best practice" is not a reason.
+- A rule that forbids borrowing from the reference carries the verbatim words of the person who set it, and the date. When the requirements change, re-check every such rule against the new words.
+- Where the approver asks for more than the reference does, the approver wins and the difference is recorded.
+
 ## Delegation
 
 Use subagents only when they add value:
@@ -88,18 +97,24 @@ Use subagents only when they add value:
 - context explorer;
 - domain/doc researcher;
 - design challenger;
-- lean challenger.
+- lean challenger;
+- reference challenger;
+- schema challenger.
 
 For a non-trivial solution, these are mandatory:
 
 1. a fresh Design Challenger — hunts for correctness/contract gaps;
-2. a Lean Challenger — hunts for overengineering/scope creep.
+2. a Lean Challenger — hunts for overengineering/scope creep;
+3. a Reference Challenger, if a reference system is named — hunts for deviations from the reference that the draft does not list;
+4. a Schema Challenger, if the design adds or changes a persistent schema — goes column by column: what forces each one, what is stored twice.
 
-Both work read-only. Only the coordinator writes the final `SOLUTION.md`.
+If the harness can run a model from another vendor, the Design Challenger runs on it as well, as a second independent pass. Two models agreeing is still not evidence.
 
-On Grok the two challengers are real `spawn_subagent` calls, launched together, before the status moves; a challenger that was not spawned must not be reported as run. Each prompt contains the role text from `references/delegation-policy.md`, the absolute path of this `SKILL.md`, the draft `SOLUTION.md` path, and the rule that the child returns findings only. Do not pass `model` unless the user named one of `grok-4.5`, `grok-4.6`, `grok-4.7`, `grok-4.7-build-fast`.
+All of them work read-only. Only the coordinator writes the final `SOLUTION.md`.
 
-If the harness does not provide an isolated-subagent tool (for example, Pi) — run the challengers inline: two separate passes, each outputting only findings in the delegation-policy format, then the coordinator responds. Do not simulate spawning subagents and do not claim they were launched.
+On Grok every mandatory challenger is a real `spawn_subagent` call, all launched together, before the status moves; a challenger that was not spawned must not be reported as run. Each prompt contains the role text from `references/delegation-policy.md`, the absolute path of this `SKILL.md`, the draft `SOLUTION.md` path, and the rule that the child returns findings only. Do not pass `model` unless the user named one of `grok-4.5`, `grok-4.6`, `grok-4.7`, `grok-4.7-build-fast`.
+
+If the harness does not provide an isolated-subagent tool (for example, Pi) — run the challengers inline: one separate pass per mandatory challenger, each outputting only findings in the delegation-policy format, then the coordinator responds. Do not simulate spawning subagents and do not claim they were launched.
 
 The coordinator applies accepted findings. If an accepted finding was `BLOCKING`, run that challenger once more against the corrected draft. A `BLOCKING` finding on the second pass stops the skill with `BLOCKED`.
 
