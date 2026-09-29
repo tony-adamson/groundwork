@@ -37,8 +37,8 @@ Check that the plan:
 - does not add a dependency/subsystem/state/abstraction outside `SOLUTION.md`;
 - does not implement future work;
 - does not refactor unrelated code;
-- has a files-to-change budget and an `Estimated LOC net`;
-- has a `Runtime preconditions` block (or `none`), each entry with a check command;
+- has a files-to-change budget and an `Estimated LOC net` for the plan and for every phase that changes files, each counting tests and verbatim code;
+- has a `Runtime preconditions` block (or `none`), each entry with a check command, a language runtime pinned with `==` to the cited production version;
 - does not build a platform for a local task;
 - includes the rejected overengineering.
 
@@ -97,7 +97,7 @@ Check the commands:
 
 ## 8. Scope gate
 
-Every planned file has a reason. Every task maps to `SOLUTION.md` or validation. The excluded areas stay excluded.
+Every planned file has a reason. Every task maps to `SOLUTION.md` or validation. The excluded areas stay excluded. Every changed contract has its consumers table (create-plan §8), with sibling repositories searched.
 
 ## 9. Result
 
