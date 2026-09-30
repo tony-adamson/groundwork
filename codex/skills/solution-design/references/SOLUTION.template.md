@@ -57,6 +57,7 @@ A short list of explicit non-goals. Especially: what might seem "useful" but is 
 - **Final working-tree state**:
 - **CURRENT_STATE.md path**:
 - **CURRENT_STATE status**:
+- **Interview**: `GRILL.md` status, or the user's verbatim words to proceed without it
 - **Source documents**:
 - **Applied solution lenses**:
 - **Known analysis limitations**:
@@ -78,6 +79,8 @@ Separate `REQUIREMENT`, `FACT`, `INFERENCE`, `ASSUMPTION`, `UNKNOWN`.
 |----|------|-------------|--------|----------|----------------------|
 
 Type: `FUNCTIONAL`, `QUALITY`, `CONSTRAINT`, `NON_GOAL`.
+
+`Source`: the task text or a `GRILL.md` entry (`ВОПРОС-N`). Nothing else.
 
 ## 4. Relevant current context
 
@@ -209,6 +212,8 @@ Do not create a file-by-file edit checklist.
 
 | ID | Decision | Drivers | Evidence | Consequences | Reversal strategy |
 |----|----------|---------|----------|--------------|-------------------|
+
+`Drivers` names the requirement ID or `ВОПРОС-N` that forces the decision.
 
 ## 14. Risks and mitigations
 

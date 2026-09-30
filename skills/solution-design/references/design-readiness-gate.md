@@ -16,7 +16,7 @@ Find risk phrases:
 - "client may handle";
 - "exact behavior later".
 
-For each occurrence: choose the behavior, classify it as a non-blocking implementation detail, turn it into an assumption with a validation method, or set `BLOCKED`.
+For each occurrence: if it is the user's decision (behavior, scope, policy), ask it and append the answer to `GRILL.md`; otherwise classify it as a non-blocking implementation detail, turn a fact that cannot be checked now into an assumption with a validation method, or set `BLOCKED`.
 
 PlanF3 does not choose architecture, public behavior, auth policy, source of truth, migration semantics, idempotency semantics, or future scope.
 
@@ -55,6 +55,8 @@ Every framework/platform capability has evidence, official docs, a spike, a fall
 
 ## 7. Traceability closure
 
+- every requirement's source is the task text or a `GRILL.md` entry; a requirement with neither is the model's guess — `FAIL`;
+- every decision names the requirement ID or `ВОПРОС-N` that forces it — otherwise `FAIL`;
 - every requirement has a design response;
 - every requirement has observable verification;
 - every decision is linked to drivers/evidence;

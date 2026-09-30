@@ -1,12 +1,12 @@
 ---
 description: "Verify an M/L change before PR: diff → scope-review (+ ops-review when the diff touches I/O) → assumptions → x2 stop rule → VERDICT line. Read-only."
-argument-hint: "[git range] [assumptions: A1 …; A2 …] [estimate: N files, M loc] [scope: goal / non-goals]"
+argument-hint: "[git range] [assumptions: ДОПУЩЕНИЕ-1 …; ДОПУЩЕНИЕ-2 …] [estimate: N files, M loc] [scope: goal / non-goals]"
 ---
 READ-ONLY verification of the current change. Do not edit files, do not run tests, formatters or build steps, do not commit. Findings only, every finding with `file:line` evidence. Tests belong to the build phase and CI, not here.
 
 Input (free text, may be empty): $@
 
-Parse the input for: a git range/ref; a list of assumptions (`A1 …`); an estimate (`N files, M loc`); scope text (goal and non-goals); an `accepted:` block — findings from earlier verification rounds and decisions the owner made while the phase was blocked. Missing parts are simply skipped, never invented.
+Parse the input for: a git range/ref; a list of assumptions (`ДОПУЩЕНИЕ-1 …`); an estimate (`N files, M loc`); scope text (goal and non-goals); an `accepted:` block — findings from earlier verification rounds and decisions the owner made while the phase was blocked. Missing parts are simply skipped, never invented.
 
 Accepted items are requirements: a change that implements one of them is in scope for scope-review even when the plan text does not mention it, and ops-review does not raise it again. An accepted item is also checked for completeness: it must be applied at every place it applies to (all jobs, all call sites), a partial application is a WARN. Lenses must not contradict each other across rounds: if ops-review demanded a safeguard in a previous round, scope-review does not reject it in this one.
 

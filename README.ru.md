@@ -11,6 +11,7 @@ Evidence-first процессные навыки для coding-агентов: �
 | Навык | Артефакт | Отвечает на вопрос |
 |---|---|---|
 | `codebase-analysis` | `CURRENT_STATE.md` | Как система работает **прямо сейчас**? Только доказательства, без предложений. |
+| `grill` | `GRILL.md` | Что пользователь на самом деле решил: каждый ответ дословно, до любого дизайна. |
 | `solution-design` | `SOLUTION.md` | Что менять, почему именно так, какие контракты должны сохраниться, что вне scope. |
 | `planf3` | `specs/<name>-implementation-plan.md` | Самый маленький исполняемый план; также исполняет утверждённый план (режим Build Plan). |
 | `ops-review` | отчёт с findings в чате | Чего в реализованном изменении **нет**? Тихие операционные отказы: отсутствующие таймауты, неограниченные ресурсы, утечки соединений, деградация при замедлившихся зависимостях. |
@@ -81,7 +82,7 @@ Install the groundwork skills from https://github.com/tony-adamson/groundwork:
    as the update source, do not delete it after install.
 2. Run ./install.sh with the flags for my harnesses:
    --claude for Claude Code, --codex for Codex CLI, --pi for Pi, --all for everything.
-3. Verify: the skills codebase-analysis, solution-design, planf3, ops-review, scope-review and debug
+3. Verify: the skills codebase-analysis, grill, solution-design, planf3, ops-review, scope-review and debug
    appear in the harness skills directory (e.g. ls ~/.claude/skills).
 To update later: git pull in the clone, then re-run ./install.sh.
 ```
@@ -98,13 +99,14 @@ To update later: git pull in the clone, then re-run ./install.sh.
 
 ## Использование
 
-В Claude Code: `/codebase-analysis`, `/solution-design`, `/planf3`, `/ops-review`, `/scope-review`, `/debug`, `/verify`.
-В Codex CLI: `$codebase-analysis`, `$solution-design`, `$planf3`, `$ops-review`, `$scope-review`, `$debug`.
+В Claude Code: `/codebase-analysis`, `/grill`, `/solution-design`, `/planf3`, `/ops-review`, `/scope-review`, `/debug`, `/verify`.
+В Codex CLI: `$codebase-analysis`, `$grill`, `$solution-design`, `$planf3`, `$ops-review`, `$scope-review`, `$debug`.
 
 Задуманный поток для задач архитектурного масштаба:
 
 ```
 codebase-analysis  →  CURRENT_STATE.md   (утвердить)
+grill              →  GRILL.md           (пользователь подтверждает общее понимание)
 solution-design    →  SOLUTION.md        (утвердить)
 planf3             →  implementation plan (утвердить, затем Build Plan)
 ops-review         →  findings о тихих отказах (выходные ворота, если diff трогает I/O)

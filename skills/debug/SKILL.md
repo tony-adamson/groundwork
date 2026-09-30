@@ -14,7 +14,7 @@ The first error is handled by the global rule (read the message and the stack tr
 - Redact secrets in everything you show (`<REDACTED>`); build loops against env vars, never paste credentials.
 - No fix before Phase 1 is done. Reading code to build a theory before a red-capable command exists is the failure this skill prevents.
 - Production is not a lab: no instrumentation or replay against live systems without explicit confirmation; use read-only tools (`prod-ro-sql`, bounded logs) for facts.
-- Reference codes: hypotheses are `H1…`, findings `F1…`; codes do not change during the session.
+- Reference codes are a word in the user's language plus a number — in Russian `ГИПОТЕЗА-1…` for hypotheses and `НАХОДКА-1…` for findings; codes do not change during the session.
 
 ## Phase 1: build the feedback loop
 
@@ -54,7 +54,7 @@ Minimise: cut inputs, callers, config, data and steps **one at a time**, re-runn
 
 ## Phase 3: hypothesise
 
-Produce **3–5 ranked hypotheses** before testing any: single-hypothesis generation anchors on the first plausible idea. Each must be falsifiable — state its prediction: "If `H1` is the cause, then changing Y makes the bug disappear / changing Z makes it worse." No prediction — no hypothesis; discard or sharpen.
+Produce **3–5 ranked hypotheses** before testing any: single-hypothesis generation anchors on the first plausible idea. Each must be falsifiable — state its prediction: "If hypothesis 1 is the cause, then changing Y makes the bug disappear / changing Z makes it worse." No prediction — no hypothesis; discard or sharpen.
 
 Show the ranked list to the user before testing. They often re-rank instantly ("we deployed #3 yesterday") or know what is already ruled out. Do not block on it: proceed with your ranking if there is no answer.
 

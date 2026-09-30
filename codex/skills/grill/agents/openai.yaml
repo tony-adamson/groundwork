@@ -1,0 +1,6 @@
+interface:
+  display_name: "Grill"
+  short_description: "Interview the user until the task is understood, before design"
+  default_prompt: "Use $grill to interview me about this task round by round and record every decision in GRILL.md."
+policy:
+  allow_implicit_invocation: false

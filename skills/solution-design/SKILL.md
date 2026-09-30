@@ -43,8 +43,9 @@ At the start:
 2. Find the Git roots and the initial working tree status.
 3. Read the local instructions and the relevant docs/manifests.
 4. Find and classify `CURRENT_STATE.md`: `CURRENT`, `PARTIAL`, `STALE`, `IRRELEVANT`, `ABSENT`.
-5. Determine the mode: `existing`, `greenfield`, `hybrid`.
-6. Determine whether this is one coherent change set or independent workstreams.
+5. Find `GRILL.md` and check its status (see "Decisions come from the interview").
+6. Determine the mode: `existing`, `greenfield`, `hybrid`.
+7. Determine whether this is one coherent change set or independent workstreams.
 
 ## Primary objective function
 
@@ -72,14 +73,15 @@ If the correct solution looks overbuilt, the status must be `BLOCKED_BY_SCOPE_OV
 - a future work parking lot;
 - a justification for every new dependency/subsystem/persistent state/abstraction, if any are needed.
 
-## Interview rounds
+## Decisions come from the interview
 
-Open questions to the user are asked as a **design tree** worked in rounds (after `grilling`, mattpocock/skills):
+`SOLUTION.md` is a synthesis of decisions the user already made in `grill`, not a place where new ones get made. `ВОПРОС-N` below stands for the question code `GRILL.md` uses, in whatever language the interview ran.
 
-- The **frontier** is every question whose prerequisites are already settled. Ask the whole frontier in one round; a question that depends on another still open one belongs to a later round.
-- Every question carries a stable code (`Q1`, `Q2`, …) and **your recommended answer** with the reason; the user may reply `Q1 ок, Q2: <answer>`.
-- Facts are yours to find (code, docs, tools, a sub-agent) — never ask the user for something you can look up. Decisions are the user's — put each to them and wait.
-- The interview is done when the frontier is empty: nothing left silently assumed. Anything still open at that point goes into `SOLUTION.md` as an explicit assumption with how it will be verified, not as a decision.
+- Read `GRILL.md` in full before drafting. If it is absent or its status is not `CONFIRMED`, stop with `BLOCKED` and name `grill` as the next step. The only exception is the user explicitly saying to proceed without an interview; quote their words in the `Interview` field of the metadata block.
+- Every requirement's `Source` is the task text or a `GRILL.md` entry (`ВОПРОС-N`). Every decision names the requirement or `ВОПРОС-N` that forces it. A decision with neither is the model's guess: remove it or put it to the user.
+- A decision the design needs that `GRILL.md` does not hold goes to the user as a question in the `grill` format and is appended to `GRILL.md` with the verbatim answer. It never becomes an assumption.
+- Assumptions are only for facts that cannot be checked now, each with how it will be verified. Points left open in a `STOPPED` interview are unknowns.
+- If the design surprises the user, the interview was too shallow: go back to `grill` rather than defend the draft.
 
 ## Reference system
 

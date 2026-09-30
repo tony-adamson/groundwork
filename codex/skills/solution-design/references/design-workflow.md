@@ -21,7 +21,7 @@ Extract:
 - `ASM-*` — assumptions;
 - `UNK-*` — unknowns.
 
-Do not turn a model's guess into a user requirement.
+Sources are the task text and `GRILL.md`. Do not turn a model's guess into a user requirement.
 
 If someone other than the requester accepts the work (a lead, a reviewer), record what they asked to see first as `CON-*`. Produce that artifact first, as one page, and wait for their answer before elaborating the rest. If the design adds or changes a persistent schema and they named nothing, the schema is that page. With no such person, this step does not apply.
 
