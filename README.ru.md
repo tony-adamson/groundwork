@@ -111,7 +111,7 @@ solution-design    →  SOLUTION.md        (утвердить)
 planf3             →  implementation plan (утвердить, затем Build Plan)
 ops-review         →  findings о тихих отказах (выходные ворота, если diff трогает I/O)
 scope-review       →  findings об избыточном scope (выходные ворота перед PR)
-verify (workflow)  →  diff → ops-review + scope-review + проверка допущений → один структурный отчёт
+verify (workflow)  →  diff → ops-review + scope-review + проверка допущений + саботаж тестов → один структурный отчёт
 debug              →  root cause + регрессионный тест (отдельно: когда баг пережил первую правку)
 ```
 
@@ -142,11 +142,14 @@ skills/артефактов, ссылки на слэш-команды) убра
 `claude/workflows/verify.workflow.js` — [dynamic workflow](https://code.claude.com/docs/en/workflows),
 который прогоняет выходные ворота одной командой `/verify [range]`: собирает
 diff, параллельно запускает `ops-review` (только если diff трогает I/O),
-`scope-review` и проверку допущений, затем сводит один структурный отчёт —
+`scope-review`, проверку допущений и — если в diff есть тесты — саботаж, затем сводит один структурный отчёт —
 вердикт, находки с evidence `file:line`, «что проверить на ревью» и статус
 `CONFIRMED`/`UNVERIFIED` по каждому допущению. Допущения scope-контракта
 передавай в `args.assumptions`, оценку — в `args.estimate`: стоп-правило
-считается кодом, а не агентом. Read-only, файлов-артефактов не создаёт. Нужен
+считается кодом, а не агентом. Саботаж ломает до пяти обещанных поведений во
+временной копии (`git worktree`) и прогоняет тесты на каждой поломке: зелёный
+набор показывает лишь согласие тестов с кодом, непойманная поломка — находка
+WARN. Рабочее дерево не меняется, файлов-артефактов не создаёт. Нужен
 Claude Code ≥ 2.1.154 с включёнными dynamic workflows в `/config`.
 
 `claude/workflows/build-plan.workflow.js` реализует утверждённый план `planf3`

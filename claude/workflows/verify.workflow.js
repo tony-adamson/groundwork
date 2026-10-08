@@ -1,10 +1,10 @@
 export const meta = {
   name: 'verify',
-  description: 'Верификация M/L-изменения: diff → parallel[ops-review, scope-review, assumption-check] → сводка. READ-ONLY, без артефактов.',
+  description: 'Верификация M/L-изменения: diff → parallel[ops-review, scope-review, assumption-check, sabotage] → сводка. Рабочее дерево не меняется, без артефактов.',
   whenToUse: 'Финальный отчёт по M/L-задаче: статус допущений, что проверить на ревью, стоп-правило ×2. Запускать по явной просьбе (/verify) после реализации, перед /code-review.',
   phases: [
     { title: 'Diff', detail: 'git diff --stat + содержательные хунки диапазона; признак I/O' },
-    { title: 'Lenses', detail: 'parallel: ops-review (если I/O), scope-review, assumption-check — по SKILL.md из ~/.claude/skills' },
+    { title: 'Lenses', detail: 'parallel: ops-review (если I/O), scope-review, assumption-check — по SKILL.md из ~/.claude/skills; sabotage (если в diff есть тесты) — поломки во временной копии' },
     { title: 'Falsify', detail: 'opus: попытка убить каждую находку линз; выживает только перевыведенная по коду' },
     { title: 'Synthesize', detail: 'дедуп и вердикт в JS; агент — «что проверить на ревью» и summary' },
   ],
@@ -122,6 +122,25 @@ const FALSIFY_SCHEMA = {
         whyNotADefect: { type: 'string', description: 'код, который делает это не-дефектом: file:line гварда, недостижимость, тип, покрывающая конвенция — либо нарушенное правило отбраковки' } } } },
   },
 }
+// Саботаж: поломка поведения во временной копии и прогон тестов на ней. Зелёный набор доказывает только то,
+// что тесты согласны с кодом; умеют ли они падать, видно лишь на поломке (тест, красный до кода только
+// на ImportError, этого не доказывает).
+const SABOTAGE_SCHEMA = {
+  type: 'object', additionalProperties: false, required: ['baseline', 'breaks', 'cleanup'],
+  properties: {
+    baseline: { type: 'object', additionalProperties: false, required: ['command', 'green', 'outputTail'],
+      properties: { command: { type: 'string' }, green: { type: 'boolean' }, outputTail: { type: 'string' } } },
+    breaks: { type: 'array', items: { type: 'object', additionalProperties: false,
+      required: ['behaviour', 'file', 'line', 'patch', 'result', 'outputTail'],
+      properties: { behaviour: { type: 'string', description: 'какое обещанное поведение сломано' },
+        file: { type: 'string' }, line: { type: 'string' },
+        patch: { type: 'string', description: 'дословный git diff поломки в копии' },
+        result: { type: 'string', enum: ['CAUGHT', 'SURVIVED', 'EQUIVALENT', 'LOAD_ERROR', 'NOT_RUN'] },
+        equivalentWhy: { type: 'string', description: 'для EQUIVALENT: почему наблюдаемое поведение не меняется; иначе пусто' },
+        outputTail: { type: 'string', description: 'последние строки вывода тестов на поломке' } } } },
+    cleanup: { type: 'string', description: 'вывод git worktree list после удаления копии' },
+  },
+}
 const SYNTH_SCHEMA = {
   type: 'object', additionalProperties: false, required: ['reviewChecks', 'summary'],
   properties: {
@@ -215,9 +234,45 @@ if (ASSUMPTIONS.length) {
 } else {
   log('assumption-check пропущен: допущения не переданы в args.assumptions')
 }
+// Пути тестов — как is_test_path в g-harness run-phase.sh: test/tests/spec/__tests__, test_*, test-*, *_test.*, *.test.*, *.spec.*, conftest.py.
+const TEST_PATH = /(^|\/)(tests?|spec|__tests__)\/|(^|\/)(test_[^/]*|test-[^/]*|[^/]*_test\.[^/]+|[^/]*\.(test|spec)\.[^/]+|conftest\.py)$/
+const SAB_MAX = 5
+// Чужой untracked-тест (не назван в scope-контракте) не повод ломать чужой код: тот же фильтр, что у стоп-правила.
+const testFiles = diff.files.map((f) => f.path).filter((p) => TEST_PATH.test(p || '') && !untrackedOutOfScope.includes(p))
+if (testFiles.length) {
+  lensTasks.push(() => agent(
+    `${ctx}
+Ты проверяешь, умеют ли тесты этого изменения падать. Тесты в diff: ${testFiles.join(', ')}.
+${SCOPE ? 'Scope-контракт (обещанное поведение и команды проверки — отсюда):\n' + SCOPE : 'Scope-контракт не передан: обещанное поведение выводи из diff и тестов.'}
+
+Рабочее дерево ${CWD} НЕ МЕНЯТЬ — ни одного файла, ни коммита. Всё делается в копии:
+1. COPY=$(mktemp -d)/wt; git -C "${CWD}" worktree add -q --detach "$COPY" HEAD. Перенеси туда изменение целиком: git -C "${CWD}" diff HEAD --binary | git -C "$COPY" apply, и скопируй untracked-файлы из git -C "${CWD}" ls-files --others --exclude-standard. Если в "${CWD}" есть node_modules, .venv или venv — сделай в копии симлинки на них. Зафиксируй изменение в копии коммитом (git -C "$COPY" add -A && git -C "$COPY" -c user.name=s -c user.email=s@localhost commit -qm base --no-verify), чтобы git diff там показывал только поломку.
+2. Команда тестов — из scope-контракта (строка «Проверки»), иначе самая узкая команда, которая запускает тесты из diff. Прогони её в копии: это baseline. Не зелёный — поломки не делать, вернуть baseline.green=false и пустой breaks.
+3. Не больше ${SAB_MAX} поломок, по одной на обещанное поведение, самое важное первым. Каждая — одна маленькая правка в исходнике (не в тесте, не в фикстуре, не в команде проверки), после которой код по-прежнему загружается: неверное значение, инвертированное условие, off-by-one, выброшенная ветка или вызов. Не синтаксическая ошибка, не удалённый импорт, не удалённая функция. Запиши git -C "$COPY" diff в patch, прогони команду тестов, затем git -C "$COPY" checkout -- . перед следующей поломкой.
+   result: CAUGHT — тесты упали на assert; SURVIVED — тесты зелёные, а наблюдаемое поведение изменилось; EQUIVALENT — тесты зелёные, потому что поломка поведения не меняет (объясни в equivalentWhy, «повезло» не причина); LOAD_ERROR — упали на загрузке (ImportError, SyntaxError, ERROR collecting, Cannot find module) — такая поломка ничего не доказывает; NOT_RUN — не удалось применить или запустить.
+4. В конце git -C "${CWD}" worktree remove --force "$COPY" и git -C "${CWD}" worktree prune; в cleanup — вывод git -C "${CWD}" worktree list.
+Не правь тесты, не предлагай исправлений — только факты прогонов.`,
+    { label: 'lens:sabotage', phase: 'Lenses', schema: SABOTAGE_SCHEMA, model: 'opus' }))
+} else {
+  log('sabotage пропущен: в diff нет тестовых файлов')
+}
 const lensResults = (await parallel(lensTasks)).filter(Boolean)
 const lenses = lensResults.filter((r) => r && r.lens)
 const assumptionResult = lensResults.find((r) => r && r.results) || null
+const sabotageResult = lensResults.find((r) => r && r.breaks) || null
+// Лимит поломок держит код, а не послушание агента.
+if (sabotageResult) sabotageResult.breaks = sabotageResult.breaks.slice(0, SAB_MAX)
+// Выжившая поломка — факт прогона, а не прочтение кода: фальсификацию она не проходит, сразу в находки.
+const sabotageFindings = sabotageResult && sabotageResult.baseline && sabotageResult.baseline.green
+  ? sabotageResult.breaks.filter((b) => b.result === 'SURVIVED').map((b) => ({
+      file: b.file, line: b.line, severity: 'WARN', rule: 'саботаж', lens: 'sabotage',
+      issue: `тесты не ловят поломку: ${b.behaviour}`,
+      evidence: `${b.patch}\n${sabotageResult.baseline.command} → зелёный на поломке\n${b.outputTail}` }))
+  : []
+const sabotageSummary = !sabotageResult ? null : !sabotageResult.baseline.green
+  ? `baseline не зелёный (${sabotageResult.baseline.command}), поломки не делались`
+  : `поймано ${sabotageResult.breaks.filter((b) => b.result === 'CAUGHT').length} из ${sabotageResult.breaks.length}; эквивалентных: ${sabotageResult.breaks.filter((b) => b.result === 'EQUIVALENT').length}; не засчитано (загрузка/не запущено): ${sabotageResult.breaks.filter((b) => b.result === 'LOAD_ERROR' || b.result === 'NOT_RUN').length}`
+if (sabotageResult) log(`sabotage: ${sabotageSummary}`)
 
 // ── Phase 3: Falsify ────────────────────────────────────────────────────
 // Один проход находит кандидатов, второй пытается их убить. Без этого линза, не нашедшая дефекта,
@@ -248,7 +303,7 @@ ${JSON.stringify(rawFindings)}
   log('Falsify пропущен: линзы не дали находок')
 }
 // Отказ прохода не должен тихо пропустить находки дальше: без результата берём исходные.
-const verifiedFindings = falsify ? falsify.survived : rawFindings
+const verifiedFindings = (falsify ? falsify.survived : rawFindings).concat(sabotageFindings)
 
 // ── Phase 4: Synthesize ─────────────────────────────────────────────────
 // Дедуп, порядок, номера и вердикт — плоский JS, как стоп-правило: агент синтеза сливал одну находку
@@ -267,6 +322,7 @@ const mergeFindings = (list) => {
     if (SEV[severity] < SEV[cur.severity]) cur.severity = severity
     if (f.issue && !cur.issue.includes(f.issue)) cur.issue += ' | ' + f.issue
     if (!cur.evidence) cur.evidence = evidence
+    else if (evidence && !cur.evidence.includes(evidence)) cur.evidence += '\n---\n' + evidence
     if (f.lens && !cur.lenses.includes(f.lens)) cur.lenses.push(f.lens)
   }
   return [...byKey.values()]
@@ -288,6 +344,7 @@ ${diff.stat}
 Вердикт (посчитан скриптом, не менять): ${verdict}
 Отбраковано в фальсификации: ${falsify ? falsify.killed.length : 0}${falsify && falsify.killed.length ? ' — ' + JSON.stringify(falsify.killed) : ''}
 Покрытие линз: ${JSON.stringify(lenses.map((l) => ({ lens: l.lens, coverage: l.coverage })))}
+Саботаж тестов: ${sabotageSummary || 'не запускался (в diff нет тестов)'}
 Статусы допущений: ${JSON.stringify(assumptionResult)}
 Стоп-правило: ${JSON.stringify(stopRule)}
 Задача:
@@ -312,6 +369,7 @@ return {
   lensesRun: lenses.map((l) => l.lens),
   falsified: falsify ? { candidates: rawFindings.length, survived: falsify.survived.length, killed: falsify.killed } : null,
   coverage: lenses.map((l) => ({ lens: l.lens, coverage: l.coverage })),
+  sabotage: sabotageResult ? { summary: sabotageSummary, baseline: sabotageResult.baseline, breaks: sabotageResult.breaks, cleanup: sabotageResult.cleanup } : null,
   findings,
   assumptions: assumptionResult ? assumptionResult.results : 'не переданы (args.assumptions)',
   reviewChecks: (synthesis && synthesis.reviewChecks) || [],
