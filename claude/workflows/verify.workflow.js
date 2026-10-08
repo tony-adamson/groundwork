@@ -73,8 +73,9 @@ const DIFF_SCHEMA = {
     dirty: { type: 'boolean', description: 'были ли незакоммиченные изменения (git status --porcelain непуст)' },
     range: { type: 'string', description: 'фактически использованный git range/описание рамки' },
     stat: { type: 'string', description: 'дословный вывод git diff --stat' },
-    files: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['path', 'added', 'removed'],
-      properties: { path: { type: 'string' }, added: { type: 'number' }, removed: { type: 'number' } } } },
+    files: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['path', 'added', 'removed', 'untracked'],
+      properties: { path: { type: 'string' }, added: { type: 'number' }, removed: { type: 'number' },
+        untracked: { type: 'boolean', description: 'файл из строк ?? git status --porcelain' } } } },
     touchesIO: { type: 'boolean', description: 'diff трогает сеть/БД/файлы/subprocess/очереди/HTTP-клиенты/миграции' },
     ioEvidence: { type: 'string', description: 'file:line, по которым решён touchesIO' },
     diffExcerpt: { type: 'string', description: 'unified diff; при большом объёме — только содержательные хунки, без сгенерированных/lock/минифицированных файлов' },
@@ -139,7 +140,7 @@ const rangeHint = RANGE
 const diff = await agent(
   `Репозиторий: ${CWD}. Собери рамку изменений для верификации. ${rangeHint}
 Через Bash: git diff --stat, список файлов с added/removed (git diff --numstat), сам diff.
-ВАЖНО: git diff не видит untracked-файлы. Возьми их из git status --porcelain (строки '??'), посчитай каждый через git diff --no-index -- /dev/null <файл> и включи в files и stat наравне с остальными — иначе новый файл целиком выпадет из locNet и стоп-правило ×2 промахнётся на diff, который его превышает.
+ВАЖНО: git diff не видит untracked-файлы. Возьми их из git status --porcelain (строки '??'), посчитай каждый через git diff --no-index -- /dev/null <файл> и включи в files (с untracked=true) и stat наравне с остальными — иначе новый файл целиком выпадет из locNet и стоп-правило ×2 промахнётся на diff, который его превышает.
 Верни head — дословный вывод git rev-parse HEAD, и dirty — непуст ли git status --porcelain. Вердикт относится к этому объекту, поэтому он должен быть назван.
 Определи touchesIO: трогает ли diff сеть, БД, файлы, subprocess, очереди, HTTP-клиенты, миграции — приведи ioEvidence (file:line).
 В diffExcerpt исключи сгенерированное (lock-файлы, минифицированное, graphify-out, снапшоты). ${READ_ONLY}`,
@@ -153,7 +154,15 @@ if (!diff || !diff.hasChanges || !(diff.files && diff.files.length)) {
 // Стоп-правило ×2 — плоский JS, без агента.
 // Lock/generated-файлы не считаются: Cargo.lock на 1285 строк — не превышение scope.
 const GENERATED = /(^|\/)(Cargo\.lock|package-lock\.json|yarn\.lock|pnpm-lock\.yaml|poetry\.lock|uv\.lock|Podfile\.lock|go\.sum|composer\.lock|Gemfile\.lock)$/
-const counted = diff.files.filter(f => !GENERATED.test(f.path || ''))
+// Untracked-файл, которого нет в scope-контракте, — чаще чужая работа в том же дереве (checker/ от 22.09,
+// supervisor/packs/ давали BLOCKED 29.09): в счёт не идёт, но перечисляется, и вердикт не выше REVIEW_REQUIRED.
+// Без scope-контракта отличить чужое нельзя — считается всё, как раньше. Имя файла ищется
+// целым токеном: подстрока давала index.js ⊂ reindex.json.
+const escapeRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const inScope = f => !SCOPE || [f.path, f.path.split('/').pop()].some(n =>
+  new RegExp(`(^|[\\s\`'"(/,])${escapeRe(n)}($|[\\s\`'"),:;.])`).test(SCOPE))
+const untrackedOutOfScope = diff.files.filter(f => f.untracked && !inScope(f)).map(f => f.path)
+const counted = diff.files.filter(f => !GENERATED.test(f.path || '') && !untrackedOutOfScope.includes(f.path))
 const filesChanged = counted.length
 const locNet = counted.reduce((s, f) => s + (f.added || 0) - (f.removed || 0), 0)
 let stopRule = null
@@ -167,6 +176,7 @@ if (ESTIMATE && (ESTIMATE.files || ESTIMATE.loc)) {
   stopRule = { estimateRaw: ESTIMATE_RAW, actual: { files: filesChanged, locNet }, triggered: false,
     detail: `estimate не распознан: ${ESTIMATE_RAW} — стоп-правило ×2 не применялось` }
 }
+if (stopRule && untrackedOutOfScope.length) stopRule.untrackedOutOfScope = untrackedOutOfScope
 log(`diff: ${filesChanged} files, ${locNet} LOC net, touchesIO=${diff.touchesIO}${stopRule && stopRule.triggered ? ' — STOP-RULE TRIGGERED' : ''}${ESTIMATE_UNPARSED ? ` — estimate не распознан: ${ESTIMATE_RAW}` : ''}`)
 
 // ── Phase 2: Lenses (parallel) ───────────────────────────────────────────
@@ -266,7 +276,7 @@ const mergeFindings = (list) => {
 const findings = mergeFindings(verifiedFindings)
 const unverifiedCount = assumptionResult ? (assumptionResult.results || []).filter((r) => r.status === 'UNVERIFIED').length : 0
 const verdict = findings.some((f) => f.severity === 'BLOCKING') || (stopRule && stopRule.triggered) ? 'BLOCKED'
-  : findings.some((f) => f.severity === 'WARN') || unverifiedCount ? 'REVIEW_REQUIRED' : 'OK'
+  : findings.some((f) => f.severity === 'WARN') || unverifiedCount || (stopRule && stopRule.untrackedOutOfScope) ? 'REVIEW_REQUIRED' : 'OK'
 log(`merge: ${verifiedFindings.length} → ${findings.length} находок, verdict=${verdict}`)
 
 phase('Synthesize')
