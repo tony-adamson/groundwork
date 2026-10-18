@@ -11,8 +11,9 @@ export const meta = {
 }
 
 // ── args ─────────────────────────────────────────────────────────────────
-// Строка: трактуется как git range/ref (пусто = рабочее дерево против merge-base).
+// Строка: трактуется как git range/ref (пусто = незакоммиченное против HEAD; чистое дерево — HEAD против merge-base).
 // Объект: { cwd?, range?, assumptions?: [{id, text}] | string[], estimate?: { files, loc }, scope?: string }
+//   cwd         — репозиторий; принимается и как repo. Уже закоммиченная часть задачи — только через range.
 //   assumptions — допущения из scope-контракта, передаёт главная сессия (workflow их не выводит).
 //   estimate    — оценка из scope-контракта для стоп-правила ×2 (считается в JS, не агентом).
 //                 Объект {files, loc} или строка вида "2 files, 120 loc" / "~5 файлов / 300 строк".
@@ -24,7 +25,8 @@ if (typeof A === 'string') {
   else A = { range: s }
 }
 A = A || {}
-const CWD = A.cwd || '.'
+// Агенты передают и repo: он молча игнорировался, и рамка собиралась в чужом репо (BLOCKED 47 файлов, EMPTY 13.10).
+const CWD = A.cwd || A.repo || '.'
 const RANGE = A.range || ''
 const ASSUMPTIONS = (A.assumptions || []).map((a, i) =>
   (typeof a === 'string') ? { id: `A${i + 1}`, text: a } : { id: a.id || `A${i + 1}`, text: a.text || String(a) })
@@ -66,9 +68,10 @@ const READ_ONLY = `READ-ONLY: ничего не править (никаких E
 // ── Schemas ──────────────────────────────────────────────────────────────
 const DIFF_SCHEMA = {
   type: 'object', additionalProperties: false,
-  required: ['hasChanges', 'range', 'stat', 'files', 'touchesIO', 'head', 'dirty'],
+  required: ['hasChanges', 'repo', 'range', 'stat', 'files', 'touchesIO', 'head', 'dirty'],
   properties: {
     hasChanges: { type: 'boolean' },
+    repo: { type: 'string', description: 'дословный вывод git rev-parse --show-toplevel — какой репозиторий проверен' },
     head: { type: 'string', description: 'git rev-parse HEAD на момент сбора рамки — объект, к которому относится вердикт' },
     dirty: { type: 'boolean', description: 'были ли незакоммиченные изменения (git status --porcelain непуст)' },
     range: { type: 'string', description: 'фактически использованный git range/описание рамки' },
@@ -155,19 +158,21 @@ const SYNTH_SCHEMA = {
 phase('Diff')
 const rangeHint = RANGE
   ? `Рамка задана явно: "${RANGE}" — используй git diff ${RANGE} (и git diff --stat ${RANGE}).`
-  : `Рамка не задана: возьми рабочее дерево + staged против merge-base с интеграционной веткой (git merge-base HEAD origin/dev или origin/main — что существует); если рабочее дерево чистое — HEAD против merge-base.`
+  : `Рамка не задана: если рабочее дерево грязное — только незакоммиченное: git diff HEAD (staged + unstaged) плюс untracked; коммиты ветки не включай. Если дерево чистое — HEAD против merge-base с интеграционной веткой (git merge-base HEAD origin/dev или origin/main — что существует).`
+// Рамка от merge-base на грязном дереве тянула закоммиченную работу ветки: 3746 и 21438 LOC при оценке 105 и 400.
+const repoHint = CWD === '.' ? 'текущий каталог (pwd); в другие каталоги не переходи' : CWD
 const diff = await agent(
-  `Репозиторий: ${CWD}. Собери рамку изменений для верификации. ${rangeHint}
+  `Репозиторий: ${repoHint}. Собери рамку изменений для верификации. ${rangeHint}
 Через Bash: git diff --stat, список файлов с added/removed (git diff --numstat), сам diff.
 ВАЖНО: git diff не видит untracked-файлы. Возьми их из git status --porcelain (строки '??'), посчитай каждый через git diff --no-index -- /dev/null <файл> и включи в files (с untracked=true) и stat наравне с остальными — иначе новый файл целиком выпадет из locNet и стоп-правило ×2 промахнётся на diff, который его превышает.
-Верни head — дословный вывод git rev-parse HEAD, и dirty — непуст ли git status --porcelain. Вердикт относится к этому объекту, поэтому он должен быть назван.
+Верни repo — дословный вывод git rev-parse --show-toplevel, head — дословный вывод git rev-parse HEAD, и dirty — непуст ли git status --porcelain. Вердикт относится к этому объекту, поэтому он должен быть назван.
 Определи touchesIO: трогает ли diff сеть, БД, файлы, subprocess, очереди, HTTP-клиенты, миграции — приведи ioEvidence (file:line).
 В diffExcerpt исключи сгенерированное (lock-файлы, минифицированное, graphify-out, снапшоты). ${READ_ONLY}`,
   { label: 'collect-diff', phase: 'Diff', schema: DIFF_SCHEMA, model: 'sonnet' }
 )
 
 if (!diff || !diff.hasChanges || !(diff.files && diff.files.length)) {
-  return { verdict: 'EMPTY', range: RANGE || 'auto', note: 'Изменений в рамке нет — проверь range/ветку/staged.', diff }
+  return { verdict: 'EMPTY', range: RANGE || 'auto', note: `Изменений в рамке нет в ${(diff && diff.repo) || CWD} — проверь range/ветку/staged; правки в другом репо — передай args.cwd.`, diff }
 }
 
 // Стоп-правило ×2 — плоский JS, без агента.
@@ -178,8 +183,42 @@ const GENERATED = /(^|\/)(Cargo\.lock|package-lock\.json|yarn\.lock|pnpm-lock\.y
 // Без scope-контракта отличить чужое нельзя — считается всё, как раньше. Имя файла ищется
 // целым токеном: подстрока давала index.js ⊂ reindex.json.
 const escapeRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-const inScope = f => !SCOPE || [f.path, f.path.split('/').pop()].some(n =>
-  new RegExp(`(^|[\\s\`'"(/,])${escapeRe(n)}($|[\\s\`'"),:;.])`).test(SCOPE))
+// Упоминание в отрицательном предложении («SESSION_STATE.md — не часть задачи», «Не входит: index.html»)
+// засчитывало файл в scope: 175 строк SESSION_STATE дали BLOCKED 14.10. Не ищутся пункт с маркером целиком
+// (файл стоит и до маркера: «X — не часть задачи»), следующие за ним пункты через ';' («Не входит: a; b; c»)
+// и строки списка под «**Не входит**:». Заголовок контракта («Файлы:») отрицание обрывает, а в собственном
+// пункте оставляет позитивным текст до маркера: «Файлы: new.py, остальное не входит».
+// Маркеры узкие: «игнорир», «не проверяется» встречаются и в позитивном «a.py (не проверяется линтером)».
+// Набор сверен со scope 55 прогонов verify 08–18.10: непойманное отрицание с папкой «dir/*» засчитало бы её целиком.
+const NEGATIVE = /не\s+входит|вне\s+(задачи|рамок|scope)|не\s+часть|не\s+относ|чуж[а-яё]*\s+(работ|правк|изменен)|out[\s-]of[\s-]scope|not\s+in\s+scope|non-goal/i
+const HEADING = /^[\s*•-]*(цель|файлы|проверки|допущения|goal|files|checks)\**\s*:/i
+const BULLET = /^\s*([-*•]|\d+[.)])\s/
+const positiveScope = scope => {
+  const out = []
+  let negativeList = false
+  for (const line of scope.split('\n')) {
+    if (negativeList && BULLET.test(line) && !HEADING.test(line)) continue
+    negativeList = NEGATIVE.test(line) && /:\**\s*$/.test(line)
+    for (const sentence of line.split(/(?<=[.!?])\s+/)) {
+      let negative = false
+      for (const clause of sentence.split(/(?<=;)\s*/)) {
+        if (HEADING.test(clause)) negative = false
+        if (negative) continue
+        const i = clause.search(NEGATIVE)
+        if (i < 0) { out.push(clause); continue }
+        negative = true
+        if (HEADING.test(clause)) out.push(clause.slice(0, i))
+      }
+    }
+  }
+  return out.join('\n')
+}
+const SCOPE_POSITIVE = positiveScope(SCOPE)
+// Папка из scope («w7d1/», «w7d1/**») покрывает свои файлы: без этого 1300 строк новой папки ушли в чужие, locNet 36.
+// Маска с расширением («docs/*.pdf») папку целиком не покрывает.
+const scopeNames = p => [p, p.split('/').pop(), ...p.split('/').slice(0, -1).map((_, i, d) => d.slice(0, i + 1).join('/') + '/')]
+const inScope = f => !SCOPE || scopeNames(f.path).some(n =>
+  new RegExp(`(^|[\\s\`'"(/,])${escapeRe(n)}($|[\\s\`'"),:;.]|\\*{1,2}(?!\\.?\\w))`).test(SCOPE_POSITIVE))
 const untrackedOutOfScope = diff.files.filter(f => f.untracked && !inScope(f)).map(f => f.path)
 const counted = diff.files.filter(f => !GENERATED.test(f.path || '') && !untrackedOutOfScope.includes(f.path))
 const filesChanged = counted.length
@@ -359,7 +398,7 @@ return {
   verdict,
   // Что именно одобрено. Без этого вердикт относится к «текущему дереву», а оно успевает уехать:
   // ещё один фикс, amend, rebase — и одобренный объект уже не тот, что лежит в истории.
-  verified: { head: diff.head, dirty: diff.dirty,
+  verified: { repo: diff.repo, head: diff.head, dirty: diff.dirty,
     note: diff.dirty ? 'дерево было грязным: вердикт относится к рабочему дереву поверх этого HEAD, а не к коммиту' : 'вердикт относится к этому коммиту' },
   range: diff.range,
   stat: diff.stat,
