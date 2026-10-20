@@ -86,7 +86,8 @@ Install the groundwork skills from https://github.com/tony-adamson/groundwork:
    --claude for Claude Code, --codex for Codex CLI, --pi for Pi, --omp for oh-my-pi,
    --dsh for DeepSeek Harness (dsh), --all for everything except dsh.
 3. Verify: the skills codebase-analysis, grill, solution-design, planf3, ops-review, scope-review and debug
-   appear in the harness skills directory (e.g. ls ~/.claude/skills).
+   appear in the harness skills directory (e.g. ls ~/.claude/skills; for dsh ls ~/.dsh/skills,
+   which also holds verify and code-review).
 To update later: git pull in the clone, then re-run ./install.sh.
 ```
 
@@ -114,6 +115,8 @@ workspace, а песочница по умолчанию (`workspace-write`) с�
 1. Правь файлы только в `skills/`.
 2. Запусти `python3 tools/build_codex.py` и закоммить оба дерева.
 3. `./install.sh --all` для раскатки локально.
+4. После правки `claude/workflows/verify.workflow.js` — `HOME=$(mktemp -d) ./install.sh --dsh`:
+   установка падает, если переписывание в dsh-вариант больше не применяется.
 
 Если нужна codex-специфичная формулировка — добавь её в `LINE_OVERRIDES` в
 `tools/build_codex.py`; сборка падает, если override перестал совпадать с
@@ -123,6 +126,9 @@ workspace, а песочница по умолчанию (`workspace-write`) с�
 
 В Claude Code: `/codebase-analysis`, `/grill`, `/solution-design`, `/planf3`, `/ops-review`, `/scope-review`, `/debug`, `/verify`.
 В Codex CLI: `$codebase-analysis`, `$grill`, `$solution-design`, `$planf3`, `$ops-review`, `$scope-review`, `$debug`.
+В dsh: те же имена, что в Claude Code, плюс `/code-review`. `/verify` и `/code-review` запускаются, только
+когда их набирает пользователь; рамку, допущения, оценку и scope писать текстом после команды, например
+`/verify estimate: 3 files, 120 loc; assumptions: ДОПУЩЕНИЕ-1 …; scope: цель / не входит`.
 
 Задуманный поток для задач архитектурного масштаба:
 
@@ -160,6 +166,13 @@ scope-контракт, стоп-правило, minimal sufficient change, ко
 Pi, omp; Claude-Code-специфичные разделы (tier-роутинг моделей, пайплайн
 skills/артефактов, ссылки на слэш-команды) убраны или переформулированы
 обобщённо.
+
+`dsh/AGENTS.md` — тот же свод правил, переписанный под DeepSeek Harness: два
+дополнительных раздела — как устроен dsh (инструменты, песочница, пути навыков)
+и как там делегировать (`subagent`, `workflow`, какая модель DeepSeek на какой
+риск); M/L-работа заканчивается просьбой к пользователю запустить `/verify`, затем
+`/code-review`. `install.sh --dsh` кладёт его в `~/.dsh/AGENTS.md`; общие правила
+синхронизировать с `claude/CLAUDE.md` вручную.
 
 `claude/workflows/verify.workflow.js` — [dynamic workflow](https://code.claude.com/docs/en/workflows),
 который прогоняет выходные ворота одной командой `/verify [range]`: собирает

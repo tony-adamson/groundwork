@@ -78,7 +78,8 @@ Install the groundwork skills from https://github.com/tony-adamson/groundwork:
    --claude for Claude Code, --codex for Codex CLI, --pi for Pi, --omp for oh-my-pi,
    --dsh for DeepSeek Harness (dsh), --all for everything except dsh.
 3. Verify: the skills codebase-analysis, grill, solution-design, planf3, ops-review, scope-review and debug
-   appear in the harness skills directory (e.g. ls ~/.claude/skills).
+   appear in the harness skills directory (e.g. ls ~/.claude/skills; for dsh ls ~/.dsh/skills,
+   which also holds verify and code-review).
 To update later: git pull in the clone, then re-run ./install.sh.
 ```
 
@@ -107,6 +108,8 @@ Checked against dsh 0.1.5-rc.1 (developer preview).
 1. Edit files under `skills/` only.
 2. Run `python3 tools/build_codex.py` and commit both trees.
 3. `./install.sh --all` to roll out locally.
+4. After changing `claude/workflows/verify.workflow.js`, run `HOME=$(mktemp -d) ./install.sh --dsh`:
+   it fails if the rewrite into the dsh variant no longer applies.
 
 If a Codex-specific wording change is needed, add it to `LINE_OVERRIDES` in
 `tools/build_codex.py`; the build fails if an override no longer matches the
@@ -116,6 +119,9 @@ canonical text, so overrides cannot silently rot.
 
 In Claude Code: `/codebase-analysis`, `/grill`, `/solution-design`, `/planf3`, `/ops-review`, `/scope-review`, `/debug`, `/verify`.
 In Codex CLI: `$codebase-analysis`, `$grill`, `$solution-design`, `$planf3`, `$ops-review`, `$scope-review`, `$debug`.
+In dsh: the Claude Code names plus `/code-review`. `/verify` and `/code-review` run only when the user
+types them; put the range, assumptions, estimate and scope as text after the command, e.g.
+`/verify estimate: 3 files, 120 loc; assumptions: ДОПУЩЕНИЕ-1 …; scope: goal / non-goals`.
 
 Intended flow for architecture-sized tasks:
 
@@ -153,6 +159,13 @@ triage, scope contract, stop rule, minimal sufficient change, contracts,
 trust pyramid) for agents that read `AGENTS.md` instead — Codex, Pi, omp;
 Claude-Code-only sections (model-tier routing, the skills/artifacts
 pipeline, slash-command references) are dropped or reworded generically.
+
+`dsh/AGENTS.md` is the same rule set rewritten for DeepSeek Harness: two extra
+sections say how dsh works (its tools, sandbox, skill paths) and how to delegate
+there (`subagent`, `workflow`, which DeepSeek model for which risk), and the
+report rule ends M/L work by asking the user for `/verify`, then `/code-review`.
+`install.sh --dsh` puts it in `~/.dsh/AGENTS.md`; keep the shared rules in sync
+with `claude/CLAUDE.md` by hand.
 
 `claude/workflows/verify.workflow.js` is a [dynamic workflow](https://code.claude.com/docs/en/workflows)
 that runs the exit gates as one command, `/verify [range]`: collects the
