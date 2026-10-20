@@ -85,7 +85,7 @@ Stop if:
 2. Match every material requirement to implementation evidence and a pass condition.
 3. Check the tracked/untracked diff.
 4. Make sure the excluded areas did not change.
-5. Run a final read-only review: `/code-review` in Claude Code, ponytail in Pi, `/verify` on Grok (it spawns scope-review, ops-review when the diff touches I/O, and code-review); if unavailable — a separate inline pass that outputs only findings. An inline reread is not a substitute for a reviewer the harness has.
+5. Run a final read-only review: `/code-review` in Claude Code, ponytail in Pi, `/verify` on Grok (it spawns scope-review, ops-review when the diff touches I/O, and code-review), `/verify` then `/code-review` in DSH (slash commands only the user can run: stop and ask for them); if unavailable — a separate inline pass that outputs only findings. An inline reread is not a substitute for a reviewer the harness has.
 6. If the diff looks bloated — shrink it: `/simplify` in Claude Code; elsewhere (no `/simplify` there — do not invent one) a separate reuse/simplification pass that applies the fixes.
 
 ## 7. Final report

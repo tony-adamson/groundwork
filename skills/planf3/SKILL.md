@@ -91,6 +91,8 @@ During implementation:
 
 On Grok, Plan Challenger, Lean Challenger, and every phase verifier are `spawn_subagent` calls. Do not pass `model` unless the user named one of `grok-4.5`, `grok-4.6`, `grok-4.7`, `grok-4.7-build-fast`. A role that was not spawned must not be reported as run.
 
+On DSH, Plan Challenger, Lean Challenger, and every phase verifier are `subagent` calls. A subagent inherits the session model: when the session runs on `deepseek-flash`, launch these roles through `workflow` with `agent(prompt, { model: 'deepseek-v4-pro' })` instead. A role that was not launched must not be reported as run.
+
 If the harness does not provide an isolated-subagent tool (for example, Pi) — perform the implementer/verifier/challenger roles inline as separate passes: the verifier pass outputs only findings, and the coordinator responds. Do not simulate spawning subagents and do not claim they were launched.
 
 ## Language

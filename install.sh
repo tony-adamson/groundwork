@@ -9,13 +9,14 @@ SKILLS=(codebase-analysis grill solution-design planf3 ops-review scope-review d
 WORKFLOWS=(verify.workflow.js build-plan.workflow.js)
 
 usage() {
-  echo "usage: $0 [--claude] [--codex] [--pi] [--omp] [--grok] [--all]"
+  echo "usage: $0 [--claude] [--codex] [--pi] [--omp] [--grok] [--dsh] [--all]"
   echo "  --claude  sync canonical skills into ~/.claude/skills and workflows into ~/.claude/workflows"
   echo "  --codex   rebuild and sync Codex variant into ~/.codex/skills"
   echo "  --pi      sync canonical skills into ~/.pi/agent/skills, agents/AGENTS.md into ~/.pi/agent/AGENTS.md, pi/prompts into ~/.pi/agent/prompts"
   echo "  --omp     sync canonical skills into ~/.omp/agent/skills and agents/AGENTS.md into ~/.omp/agent/AGENTS.md"
   echo "  --grok    sync canonical skills into ~/.grok/skills (~/.grok/rules stays hand-adapted)"
-  echo "  --all     all of the above"
+  echo "  --dsh     sync canonical skills and dsh/skills (verify, code-review) into ~/.dsh/skills, dsh/AGENTS.md into ~/.dsh/AGENTS.md"
+  echo "  --all     all of the above except --dsh"
   exit 1
 }
 
@@ -30,7 +31,7 @@ sync_tree() {
 
 [ $# -gt 0 ] || usage
 
-do_claude=false do_codex=false do_pi=false do_omp=false do_grok=false
+do_claude=false do_codex=false do_pi=false do_omp=false do_grok=false do_dsh=false
 for arg in "$@"; do
   case "$arg" in
     --claude) do_claude=true ;;
@@ -38,6 +39,7 @@ for arg in "$@"; do
     --pi) do_pi=true ;;
     --omp) do_omp=true ;;
     --grok) do_grok=true ;;
+    --dsh) do_dsh=true ;;
     --all) do_claude=true do_codex=true do_pi=true do_omp=true do_grok=true ;;
     *) usage ;;
   esac
@@ -89,4 +91,45 @@ if $do_grok; then
   # Grok reads the canon as is: its spawn_subagent wording lives in the skills as "On Grok ..." lines.
   # Only the skills are mirrored; ~/.grok/skills also holds Grok's own verify/code-review, which stay.
   sync_tree "$REPO/skills" "$HOME/.grok/skills"
+fi
+if $do_dsh; then
+  # Not in --all: for an owner whose ~/.agents/skills already links ~/.claude/skills, this copy shadows those
+  # (dsh prefers ~/.dsh/skills on a name clash) and their ~/.dsh/AGENTS.md is replaced — do it on purpose only.
+  sync_tree "$REPO/skills" "$HOME/.dsh/skills"
+  for s in verify code-review; do
+    mkdir -p "$HOME/.dsh/skills/$s"
+    rsync -a --delete --exclude .DS_Store --exclude verify.workflow.js "$REPO/dsh/skills/$s/" "$HOME/.dsh/skills/$s/"
+    echo "synced: $s -> $HOME/.dsh/skills/$s"
+  done
+  # dsh takes a workflow only inline and rejects `export const meta` (meta rides the tool call, see
+  # dsh/skills/verify/SKILL.md), so the Claude workflow is rewritten here rather than forked into dsh/.
+  # Comment lines go too: the model re-types the whole script into the tool call.
+  # dsh schemas allow only type/properties/required/additionalProperties/items/enum/const plus annotations.
+  wf="$HOME/.dsh/skills/verify/verify.workflow.js"
+  sed -e '/^export const meta = {$/,/^}$/d' \
+      -e '/^[[:space:]]*\/\//d' \
+      -e 's/ minItems: [0-9]*,//g' \
+      -e 's/ maxItems: [0-9]*,//g' \
+      -e "s/model: 'sonnet'/model: 'deepseek-flash'/g" \
+      -e "s/model: 'opus'/model: 'deepseek-v4-pro'/g" \
+      -e "s#^const SKILLS = '~/.claude/skills'\$#const SKILLS = '~/.dsh/skills'#" \
+      "$REPO/claude/workflows/verify.workflow.js" > "$wf.tmp"
+  if grep -n -e 'export const meta' -e '\.claude' "$wf.tmp" >&2 \
+    || grep -nE '(minItems|maxItems|minLength|maxLength|minimum|maximum|pattern|format): ' "$wf.tmp" >&2 \
+    || grep -n "model: '" "$wf.tmp" | grep -v "model: 'deepseek-" >&2 \
+    || ! grep -q "^const SKILLS = '~/.dsh/skills'$" "$wf.tmp"; then
+    rm -f "$wf.tmp"
+    echo "FAILED: claude/workflows/verify.workflow.js changed shape; update the rewrite in install.sh" >&2
+    exit 1
+  fi
+  mv "$wf.tmp" "$wf"
+  echo "generated: claude/workflows/verify.workflow.js -> $wf"
+  dst="$HOME/.dsh/AGENTS.md"
+  if [ -f "$dst" ] && ! cmp -s "$REPO/dsh/AGENTS.md" "$dst"; then
+    bak="$dst.bak-$(date +%Y%m%d%H%M%S)"
+    cp "$dst" "$bak"
+    echo "WARNING: $dst differed from dsh/AGENTS.md; the previous version is saved as $bak" >&2
+  fi
+  cp "$REPO/dsh/AGENTS.md" "$dst"
+  echo "copied: dsh/AGENTS.md -> $dst"
 fi

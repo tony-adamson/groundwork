@@ -36,6 +36,7 @@ skills/            canonical versions (Claude Code / Pi format) — edit these
 codex/skills/      generated Codex CLI variant — do not edit by hand
 codex/overlay/     Codex-only files (agents/openai.yaml) merged in at build time
 tools/build_codex.py   regenerates codex/skills/ from skills/
+dsh/               DeepSeek Harness only: AGENTS.md and the verify/code-review skills
 install.sh         mirrors skills into local harnesses
 ```
 
@@ -55,6 +56,7 @@ cd groundwork
 ./install.sh --pi           # ~/.pi/agent/skills + agents/AGENTS.md -> ~/.pi/agent/AGENTS.md + pi/prompts -> ~/.pi/agent/prompts
 ./install.sh --omp          # ~/.omp/agent/skills + agents/AGENTS.md -> ~/.omp/agent/AGENTS.md
 ./install.sh --grok         # ~/.grok/skills (Grok rules in ~/.grok/rules are adapted by hand)
+./install.sh --dsh          # ~/.dsh/skills (+ verify, code-review) + dsh/AGENTS.md -> ~/.dsh/AGENTS.md; not part of --all
 ```
 
 Cursor needs no flag: it loads `~/.claude/skills` and `~/.codex/skills` itself.
@@ -73,11 +75,32 @@ Install the groundwork skills from https://github.com/tony-adamson/groundwork:
 1. Clone the repo to a permanent location (e.g. ~/tools/groundwork) — it stays
    as the update source, do not delete it after install.
 2. Run ./install.sh with the flags for my harnesses:
-   --claude for Claude Code, --codex for Codex CLI, --pi for Pi, --omp for oh-my-pi, --all for everything.
+   --claude for Claude Code, --codex for Codex CLI, --pi for Pi, --omp for oh-my-pi,
+   --dsh for DeepSeek Harness (dsh), --all for everything except dsh.
 3. Verify: the skills codebase-analysis, grill, solution-design, planf3, ops-review, scope-review and debug
    appear in the harness skills directory (e.g. ls ~/.claude/skills).
 To update later: git pull in the clone, then re-run ./install.sh.
 ```
+
+### DeepSeek Harness (dsh)
+
+In dsh it is enough to say: «install groundwork from https://github.com/tony-adamson/groundwork».
+The agent follows the block above with `--dsh`, which installs:
+
+- the seven skills plus `verify` and `code-review` into `~/.dsh/skills` — plain copies, no symlinks;
+- `dsh/AGENTS.md` into `~/.dsh/AGENTS.md` (dsh does not read `~/.agents/AGENTS.md`). A different file
+  already there is kept as `~/.dsh/AGENTS.md.bak-<timestamp>` and the installer says so.
+
+dsh asks for approval twice, and that is expected: the clone into `~/tools` and the install into
+`~/.dsh` both write outside the workspace, which the default `workspace-write` sandbox does not allow
+on its own. Approve both.
+
+Check: in a new dsh session type `/` — `/grill`, `/verify` and `/code-review` appear in the composer.
+`/verify` and `/code-review` run only as slash commands: write the range, assumptions, estimate and
+scope as text after the command, dsh has no argument substitution.
+`~/.dsh/skills/verify/verify.workflow.js` is generated from `claude/workflows/verify.workflow.js` at
+install time (dsh models, no `export const meta`) — edit the canon, never the copy.
+Checked against dsh 0.1.5-rc.1 (developer preview).
 
 ## Editing
 
