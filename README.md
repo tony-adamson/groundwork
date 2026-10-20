@@ -97,8 +97,9 @@ dsh asks for approval twice, and that is expected: the clone into `~/tools` and 
 on its own. Approve both.
 
 Check: in a new dsh session type `/` — `/grill`, `/verify` and `/code-review` appear in the composer.
-`/verify` and `/code-review` run only as slash commands: write the range, assumptions, estimate and
-scope as text after the command, dsh has no argument substitution.
+`/verify` and `/code-review` run only on the user's explicit request — the slash command or plain words
+(«run verify»); the agent never starts them on its own. Write the range, assumptions, estimate and
+scope as text in the same message, dsh has no argument substitution.
 `~/.dsh/skills/verify/verify.workflow.js` is generated from `claude/workflows/verify.workflow.js` at
 install time (dsh models, no `export const meta`) — edit the canon, never the copy.
 Checked against dsh 0.1.5-rc.1 (developer preview).
@@ -120,7 +121,7 @@ canonical text, so overrides cannot silently rot.
 In Claude Code: `/codebase-analysis`, `/grill`, `/solution-design`, `/planf3`, `/ops-review`, `/scope-review`, `/debug`, `/verify`.
 In Codex CLI: `$codebase-analysis`, `$grill`, `$solution-design`, `$planf3`, `$ops-review`, `$scope-review`, `$debug`.
 In dsh: the Claude Code names plus `/code-review`. `/verify` and `/code-review` run only when the user
-types them; put the range, assumptions, estimate and scope as text after the command, e.g.
+asks for them, by the command or in words; put the range, assumptions, estimate and scope as text in the same message, e.g.
 `/verify estimate: 3 files, 120 loc; assumptions: ДОПУЩЕНИЕ-1 …; scope: goal / non-goals`.
 
 Intended flow for architecture-sized tasks:

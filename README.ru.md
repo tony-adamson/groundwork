@@ -104,8 +104,9 @@ dsh дважды спросит разрешение, и это ожидаемо
 workspace, а песочница по умолчанию (`workspace-write`) сама этого не разрешает. Подтвердить оба раза.
 
 Проверка: в новой сессии dsh набрать `/` — в композере видны `/grill`, `/verify` и `/code-review`.
-`/verify` и `/code-review` запускаются только слэш-командой: рамку, допущения, оценку и scope писать
-текстом после команды, подстановки аргументов в dsh нет.
+`/verify` и `/code-review` запускаются только по явной просьбе пользователя — слэш-командой или словами
+(«запусти verify»); сам агент их не запускает. Рамку, допущения, оценку и scope писать текстом в том же
+сообщении, подстановки аргументов в dsh нет.
 `~/.dsh/skills/verify/verify.workflow.js` генерируется при установке из `claude/workflows/verify.workflow.js`
 (модели dsh, без `export const meta`) — править канон, не копию.
 Проверено на dsh 0.1.5-rc.1 (developer preview).
@@ -127,7 +128,7 @@ workspace, а песочница по умолчанию (`workspace-write`) с�
 В Claude Code: `/codebase-analysis`, `/grill`, `/solution-design`, `/planf3`, `/ops-review`, `/scope-review`, `/debug`, `/verify`.
 В Codex CLI: `$codebase-analysis`, `$grill`, `$solution-design`, `$planf3`, `$ops-review`, `$scope-review`, `$debug`.
 В dsh: те же имена, что в Claude Code, плюс `/code-review`. `/verify` и `/code-review` запускаются, только
-когда их набирает пользователь; рамку, допущения, оценку и scope писать текстом после команды, например
+когда их просит пользователь — командой или словами; рамку, допущения, оценку и scope писать текстом в том же сообщении, например
 `/verify estimate: 3 files, 120 loc; assumptions: ДОПУЩЕНИЕ-1 …; scope: цель / не входит`.
 
 Задуманный поток для задач архитектурного масштаба:
