@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 ## Как запускать
 
-`verify.workflow.js` в этой папке — сгенерированная копия `claude/workflows/verify.workflow.js` из groundwork (модели `deepseek-*`, линзы читаются из `~/.dsh/skills`). Руками не править: правка канона и `install.sh --dsh`.
+`verify.workflow.js` в этой папке — сгенерированная копия `claude/workflows/verify.workflow.js` из groundwork (`deepseek-flash` у каждого агента, линзы читаются из `~/.dsh/skills`). Руками не править: правка канона и `install.sh --dsh`.
 
 Прочитать `verify.workflow.js` и вызвать инструмент `workflow`:
 

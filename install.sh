@@ -110,13 +110,12 @@ if $do_dsh; then
       -e '/^[[:space:]]*\/\//d' \
       -e 's/ minItems: [0-9]*,//g' \
       -e 's/ maxItems: [0-9]*,//g' \
-      -e "s/model: 'sonnet'/model: 'deepseek-flash'/g" \
-      -e "s/model: 'opus'/model: 'deepseek-v4-pro'/g" \
+      -e "s/model: '[a-z]*'/model: 'deepseek-flash'/g" \
       -e "s#^const SKILLS = '~/.claude/skills'\$#const SKILLS = '~/.dsh/skills'#" \
       "$REPO/claude/workflows/verify.workflow.js" > "$wf.tmp"
   if grep -n -e 'export const meta' -e '\.claude' "$wf.tmp" >&2 \
     || grep -nE '(minItems|maxItems|minLength|maxLength|minimum|maximum|pattern|format): ' "$wf.tmp" >&2 \
-    || grep -n "model: '" "$wf.tmp" | grep -v "model: 'deepseek-" >&2 \
+    || grep -n "model: '" "$wf.tmp" | grep -v "model: 'deepseek-flash'" >&2 \
     || ! grep -q "^const SKILLS = '~/.dsh/skills'$" "$wf.tmp"; then
     rm -f "$wf.tmp"
     echo "FAILED: claude/workflows/verify.workflow.js changed shape; update the rewrite in install.sh" >&2

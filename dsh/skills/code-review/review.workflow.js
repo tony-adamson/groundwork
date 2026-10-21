@@ -1,11 +1,11 @@
 // code-review: ревью diff на намерение и дефекты.
-// Модель ревью закреплена явно: сабагенты наследуют модель сессии, а ревью на быстрой модели
-// не ловит то, ради чего запускается. provider не задан — берётся провайдер сессии.
+// Модель закреплена явно: сабагенты наследуют модель сессии, а порт работает на deepseek-flash,
+// даже если сессию переключили на pro. provider не задан — берётся провайдер сессии.
 const A = args || {}
 const CWD = String(A.cwd || '.')
 const RANGE = String(A.range || '').trim()
 const SCOPE = String(A.scope || '').trim()
-const MODEL = 'deepseek-v4-pro'
+const MODEL = 'deepseek-flash'
 const READ_ONLY = 'READ-ONLY: файлы не править, не коммитить, новых файлов не создавать. Только чтение и git без записи.'
 
 const FINDING = {
@@ -63,7 +63,7 @@ const intake = await agent(
     ? `Рамка задана: git -C ${CWD} diff --stat ${RANGE} и git -C ${CWD} diff ${RANGE}.`
     : `Рамка не задана: если git -C ${CWD} status --porcelain непуст — только незакоммиченное (git diff HEAD плюс untracked из строк '??'), коммиты ветки не включай; если дерево чистое — HEAD против merge-base с веткой из git symbolic-ref refs/remotes/origin/HEAD, а если её нет — с origin/dev или origin/main (что существует). В range запиши, с какой веткой сравнивал.`}
 Нужны: repo (git rev-parse --show-toplevel дословно), range (что реально использовал), stat (git diff --stat дословно), files (пути), hasChanges. ${READ_ONLY}`,
-  { label: 'intake', phase: 'Intake', schema: INTAKE, model: 'deepseek-flash' }
+  { label: 'intake', phase: 'Intake', schema: INTAKE, model: MODEL }
 )
 if (!intake) return { verdict: 'FAILED', note: 'сбор рамки не удался' }
 if (!intake.hasChanges) return { verdict: 'EMPTY', range: intake.range, note: `изменений нет в ${intake.repo}` }

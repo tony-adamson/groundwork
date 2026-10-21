@@ -101,7 +101,7 @@ Check: in a new dsh session type `/` — `/grill`, `/verify` and `/code-review` 
 («run verify»); the agent never starts them on its own. Write the range, assumptions, estimate and
 scope as text in the same message, dsh has no argument substitution.
 `~/.dsh/skills/verify/verify.workflow.js` is generated from `claude/workflows/verify.workflow.js` at
-install time (dsh models, no `export const meta`) — edit the canon, never the copy.
+install time (`deepseek-flash` for every agent, no `export const meta`) — edit the canon, never the copy.
 Checked against dsh 0.1.5-rc.1 (developer preview).
 
 ## Editing
@@ -163,7 +163,7 @@ pipeline, slash-command references) are dropped or reworded generically.
 
 `dsh/AGENTS.md` is the same rule set rewritten for DeepSeek Harness: two extra
 sections say how dsh works (its tools, sandbox, skill paths) and how to delegate
-there (`subagent`, `workflow`, which DeepSeek model for which risk), and the
+there (`subagent`, `workflow`; `deepseek-flash` by default), and the
 report rule ends M/L work by asking the user for `/verify`, then `/code-review`.
 `install.sh --dsh` puts it in `~/.dsh/AGENTS.md`; keep the shared rules in sync
 with `claude/CLAUDE.md` by hand.
